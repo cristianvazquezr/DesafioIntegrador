@@ -5,3 +5,24 @@ navBar.className=navBar.className + " ocultarComponente"
 //color de fondo en el home
 let contPrinc=document.getElementById("contenedorPrincipal")
 contPrinc.className=contPrinc.className + " colorFondo"
+
+//boton de github
+let botonLoginGH = document.getElementById("btnGitHome")
+botonLoginGH.onclick = (event)=>{
+    event.preventDefault()
+    location.href='/api/session/github'
+}
+
+//boton de ingresar
+let botoningresar = document.getElementById("btnIngresar")
+botoningresar.onclick = (event)=>{
+    event.preventDefault()
+    location.href='/login'
+}
+
+//boton de registrar
+let botonRegistrar = document.getElementById("btnRegistrar")
+botonRegistrar.onclick = (event)=>{
+    event.preventDefault()
+    location.href='/register'
+}

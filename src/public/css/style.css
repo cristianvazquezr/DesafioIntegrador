@@ -160,14 +160,13 @@
 
 .slogan{
     background-repeat: no-repeat;
-    background-position: right;
+    background-position: right bottom;
     height: 100%;
-    background-image: linear-gradient(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)), url("/../../images/Logo.png");
-    display: flex;
-    flex-direction: column;
+    background-image: linear-gradient(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)), url("/../../images/LogoFondo.png");
 }
 .subSlogan{
     text-align: center;
+    padding-top: 10vh;
 }
 
 .contenedorSlogan{
@@ -183,3 +182,48 @@
     background-color: #ffffff;
 }
 
+.subSlogan h1{
+    font-family: 'Passion One', cursive;
+    font-weight: 700;
+    font-size: 6vw;
+}
+.subSlogan h3{
+    font-family: 'Gruppo', sans-serif;
+    font-size: 4vw;
+}
+
+.subSlogan h4{
+    font-family: 'Gruppo', sans-serif;
+    font-size: 3vw;
+}
+.loginRegister{
+    padding-top: 10vh;
+}
+
+.btnLoginRegister{
+    display: flex;
+    flex-direction: column;
+    height: 40vh;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.inicio{
+    width: 30vw;
+    margin: none;
+    background-color: #dedede15;
+    border-radius: 10%;
+}
+
+.btnGitHome, .btnIngresar, .btnRegistrar{
+    width: 20vw;
+    height: 60px;
+
+}
+
+.btnGitHome{
+    background-color:rgb(255, 255, 255);
+    border-color: black;
+    color: black;
+}
