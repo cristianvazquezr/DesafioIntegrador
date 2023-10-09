@@ -17,10 +17,12 @@ import session from 'express-session'
 import MongoStore from 'connect-mongo';
 import passport from 'passport';
 import initiliazePassport from './config/passport.config.js'
-
+import config from './config/config.js'
 //Creo el servidor
 
-const puerto=8080
+console.log(config);
+
+const puerto=config.port
 
 const app=express()
 
@@ -29,7 +31,7 @@ const httpServer= app.listen(puerto,async ()=>{
 })
 const socketServer = new Server(httpServer)
 
-mongoose.connect('mongodb+srv://vazquezcristianr:Cristian123@clustercristian.ggp7vhd.mongodb.net/ecommerce?retryWrites=true&w=majority') 
+mongoose.connect(config.mongoURL) 
 
 app.use(express.static(__dirname + "/public"))
 app.engine("handlebars",expressHandlebars.engine({
@@ -41,7 +43,7 @@ app.use(express.urlencoded({extended:true}))
 app.use(express.json())
 app.use(session({
     store:MongoStore.create({
-        mongoUrl:"mongodb+srv://vazquezcristianr:Cristian123@clustercristian.ggp7vhd.mongodb.net/ecommerce?retryWrites=true&w=majority",
+        mongoUrl:config.mongoURL,
         mongoOptions:{useNewUrlParser:true,useUnifiedTopology:true},
         ttl:15000,
     }),

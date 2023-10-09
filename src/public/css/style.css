@@ -156,8 +156,12 @@
 .restore, .register{
     display: flex;
     flex-direction: row;
+    align-items: center;
 }
 
+.restore a, .register a{
+    margin-bottom:8px
+}
 .slogan{
     background-repeat: no-repeat;
     background-position: right bottom;
@@ -187,6 +191,10 @@
     font-weight: 700;
     font-size: 6vw;
 }
+
+.tituloMarca{
+    color: #997150;
+}
 .subSlogan h3{
     font-family: 'Gruppo', sans-serif;
     font-size: 4vw;
@@ -207,6 +215,7 @@
     justify-content: center;
     align-items: center;
     gap: 10px;
+    box-shadow: 7px 7px 20px 2px gray;
 }
 
 .inicio{
@@ -226,4 +235,10 @@
     background-color:rgb(255, 255, 255);
     border-color: black;
     color: black;
+}
+
+.btnGitHome:hover {
+    color: #fff;
+    background-color: #75797b5e;
+    border-color: #75797b5e;
 }
