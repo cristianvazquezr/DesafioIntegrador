@@ -1,6 +1,5 @@
 import { Router } from "express"
-import ProductManager from '../dao/ProductManager.js'
-import cartManager from "../dao/cartManager.js"
+import viewsController from "../controllers/views.controller.js"
 import { authorization } from "../utils.js"
 //creo el middleware para autenticar administrador
 function authAdmin(req, res, next) {
@@ -17,9 +16,6 @@ function auth(req, res, next) {
     return next()
     }
     return res.status(401).send('error de autorización!').redirect("/login")
-    
-    
-   
 }
 
 //creo el middleware para autenticar logueo
@@ -33,100 +29,29 @@ function authLogin(req, res, next) {
 }
 
 
-//instancio la clase Productmanager
+//instancio la clase viwsController
 
-const PM = new ProductManager()
-const CM = new cartManager()
+const VC = new viewsController()
 
 const viewsRouter=Router()
 
-viewsRouter.get('/', async (req,resp)=>{
-    resp.render("home",{
-        style:"style.css"
-        
-    })
- 
-})
+viewsRouter.get('/',VC.home)
 
-viewsRouter.get('/products',auth, async (req,resp)=>{
+viewsRouter.get('/products',auth, VC.products)
 
-    let userLogged=req.user.first_name   
-    let productos=await PM.getProducts(req.query)
+viewsRouter.get('/realtimeproducts',authorization('admin'),VC.realTimeProducts)
 
-    resp.render("products",{
-        product:productos,
-        user:userLogged,
-        style:"../../css/style.css",
-        
-    })
- 
-})
+viewsRouter.get('/chat',auth,VC.chat)
 
-viewsRouter.get('/realtimeproducts',authorization('admin'),async (req,resp)=>{
+viewsRouter.get('/cart/:cid', auth,VC.cart)
 
-    let userLogged=req.user.first_name
+viewsRouter.get('/login',authLogin ,VC.login)
 
-    resp.render("realTimeProducts",{
-        user:userLogged,
-        style:"style.css"
-    })
-})
+viewsRouter.get('/register',authLogin,VC.register)
 
-viewsRouter.get('/chat',auth,async (req,resp)=>{
+viewsRouter.get('/profile',VC.profile)
 
-    let userLogged=req.user.first_name
+viewsRouter.get('/restore',VC.restore)
 
-    resp.render("chat",{
-        user:userLogged,
-        style:"../../css/style.css"
-        
-    })
-})
-
-viewsRouter.get('/cart/:cid', auth,async (req,resp)=>{
-
-    let userLogged=req.user.first_name
-    let cid=req.params.cid
-    let respuesta=await CM.getCartById(cid)
-    resp.render("cartId",{
-        user:userLogged,
-        productos:respuesta[0].products,
-        style:"../../css/style.css",
-    })
-})
-
-viewsRouter.get('/login',authLogin ,async (req,resp)=>{
-    resp.render("login",{
-        style:"../../css/style.css"
-    })
-})
-viewsRouter.get('/register',authLogin,async (req,resp)=>{
-    resp.render("register",{
-        style:"../../css/style.css"
-    })
-})
-viewsRouter.get('/profile', async (req,resp)=>{
-
-    let userLogged=req.user.first_name
-
-    resp.render("profile",{
-        user:userLogged,
-        style:"../../css/style.css"
-    })
-})
-
-viewsRouter.get('/restore',async (req,resp)=>{
-    resp.render("restore",{
-        style:"../../css/style.css"
-    })
-})
-
-
-
-// viewsRouter.get('*', async(req, res)=>{
-//     res.render("error",{
-//         style:"../../css/style.css"
-//     })
-// })
 
 export default viewsRouter  

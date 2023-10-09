@@ -1,10 +1,12 @@
 import { messageModel } from "./models/message.model.js";
 
+const MC = new messageController()
+
 
 class messageMananger{
 
     constructor(){
-
+        
     }
 
     async getMessage(){

@@ -1,72 +1,28 @@
 import { Router } from "express"
-import userMananger from '../dao/userMananger.js'
+import userController from "../controllers/user.controller.js"
 import passport from "passport"
-import {generateToken, authToken, passportCall} from '../utils.js'
+import {passportCall} from '../utils.js'
 
 
 
 
 //isntancio la clase cartManager
 
-const UM = new userMananger()
+const UC = new userController()
 
 const sessionRouter=Router()
 
-// //login
-// sessionRouter.get('/session/login', async (req, resp)=>{
-//     let {user, pass}=req.query
-//     let userlogged= await UM.login(user, pass)
-//     delete userlogged.password
-//     if(userlogged=="invalidUser"){
-
-//         resp.status(400).send({status:'ERROR', message:"Usuario incorrecto"})
-//     }
-//     else if(userlogged=="invalidPassword"){
-//         resp.status(403).send({status:'ERROR', message:"Clave incorrecta"})
-//     }
-//     else{
-//         req.session.users = userlogged
-//         resp.send({status:'OK', message:"usuario y clave correctos ", datos:userlogged})
-//     }
-        
-// })
-
-
-
-
 //login con passport 
+sessionRouter.post('/session/login', passport.authenticate('login'), UC.login)
 
-sessionRouter.post('/session/login', passport.authenticate('login'), async(req, res)=>{
-    if(!req.user) return res.status(400).send({status:"error",message:"credenciales invalidas"})
-    delete req.user.password
-    const access_token=generateToken(req.user)
-    console.log(access_token)
-    res.cookie("cookieEcommerce", access_token, {maxAge:3600000, httpOnly:true}).send({status:"success", access_token,datos:req.user})
-})
-
-sessionRouter.get('/session/current',passportCall('jwt'),(req,res)=>{
-    res.send({status:'success', datos:req.user})
-})
+//current
+sessionRouter.get('/session/current',passportCall('jwt'),UC.current)
 
 //login con passport github
+sessionRouter.get('/session/github', passport.authenticate('github', {scope:'user:email'}), async(req, res)=>{ })
 
-sessionRouter.get('/session/github', passport.authenticate('github', {scope:'user:email'}), async(req, res)=>{
-    
-})
-
-sessionRouter.get('/session/githubCallBack', passport.authenticate('github', {failureRedirect:'/session/login'}), async(req, res)=>{
-    console.log(req.user)
-    req.session.user={
-        fist_name:req.user.first_name,
-        last_name:req.user.last_name,
-        age:req.user.age,
-        email:req.user.email,
-        admin:req.user.admin
-    }
-    const access_token=generateToken(req.user)
-    res.cookie("cookieEcommerce", access_token, {maxAge:3600000, httpOnly:true}).redirect('/products')
-    
-})
+//login con passport github
+sessionRouter.get('/session/githubCallBack', passport.authenticate('github', {failureRedirect:'/session/login'}),UC.loginGitHub )
 
 //registro
 // sessionRouter.post('/session/register', async (req,resp)=>{
@@ -86,35 +42,13 @@ sessionRouter.get('/session/githubCallBack', passport.authenticate('github', {fa
 
 
 //registro con passport
-
-sessionRouter.post('/session/register',passport.authenticate('register'), async (req, res)=>{
-    const access_token=generateToken(req.user)
-    res.send({status:"success", access_token})
-})
-
+sessionRouter.post('/session/register',passport.authenticate('register'), UC.register)
 
 //logout
-
-sessionRouter.get('/session/logout',(req,res)=>{
-    req.session.destroy();
-    res.redirect('/login');
-})
+sessionRouter.get('/session/logout',UC.logout)
 
 //restore
-sessionRouter.post('/session/restore', async (req, resp)=>{
-    let {user, pass}=req.query
-    let userlogged= await UM.restore(user, pass)
-    delete userlogged.password
-    if(userlogged=="invalidUser"){
-
-        resp.status(400).send({status:'ERROR', message:"Usuario incorrecto"})
-    }
-    else{
-        req.session.users = userlogged
-        resp.send({status:'OK', message:"Clave modificada exitosamente ", datos:userlogged})
-    }
-        
-})
+sessionRouter.post('/session/restore', UC.restore)
 
 
 

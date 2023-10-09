@@ -1,19 +1,12 @@
 import { Router } from "express";
-import messageMananger from "../dao/messageManager.js";
+import messageController from "../controllers/message.controller.js";
 
-let MM = new messageMananger()
+let MC = new messageController()
 
 const messageRouter=Router()
 
-messageRouter.get('/message', async (req, resp)=>{
-    resp.send(await MM.getMessage())
-})
+messageRouter.get('/message', MC.getMessage )
 
-messageRouter.post('/message', async (req, resp)=>{
-
-    let {usuario, mensaje}=param.body
-
-    resp.send(await MM.createMessage(usuario, mensaje))
-})
+messageRouter.post('/message', MC.createMessage )
 
 export default messageRouter
