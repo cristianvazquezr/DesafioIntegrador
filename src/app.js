@@ -18,6 +18,7 @@ import MongoStore from 'connect-mongo';
 import passport from 'passport';
 import initiliazePassport from './config/passport.config.js'
 import config from './config/config.js'
+import userRouter from './Routes/user.router.js'
 //Creo el servidor
 
 console.log(config);
@@ -60,6 +61,7 @@ app.use("/", viewsRouter)
 app.use("/api", productRouter)
 app.use("/api", cartRouter)
 app.use("/api", sessionRouter)
+app.use("/api", userRouter)
 app.use("/", messageRouter)
 
 

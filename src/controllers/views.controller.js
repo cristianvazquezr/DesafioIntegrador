@@ -1,11 +1,13 @@
 import ProductManager from "../dao/ProductManager.js"
 import cartManager from "../dao/cartManager.js"
+import ticketManager from "../dao/ticketManager.js"
 
 class viewsController{
     constructor(){
     //instancio la clase Productmanager y cart
     this.PM = new ProductManager()
     this.CM = new cartManager()
+    this.TM= new ticketManager()
     }
     home = async (req,resp)=>{
         resp.render("home",{
@@ -77,6 +79,25 @@ class viewsController{
             style:"../../css/style.css"
         })
     }
+
+    purchase = async (req,resp)=>{
+
+        let nameLogged=req.user.first_name
+        let lastNameLogged=req.user.last_name
+        console.log(req.user)
+        let tid=req.params.tid
+        let respuesta=await this.TM.getTicketById(tid)
+        console.log(respuesta)
+        resp.render("ticket",{
+            nameClient:nameLogged,
+            lastNameCLient:lastNameLogged,
+            idBuy:tid,
+            productos:respuesta.purchesedProducts,
+            sinStock:respuesta.notPurchesedProducts,
+            style:"../../css/style.css",
+        })
+    }
+
 }
 
 export default viewsController

@@ -1,8 +1,10 @@
+import ProductManager from "../dao/ProductManager.js";
 import cartManager from "../dao/cartManager.js";
 
 class cartController {
     constructor(){
         this.CM=new cartManager()
+        this.PM=new ProductManager()
     }
 
     createCart=async (req, resp)=>{
@@ -106,6 +108,17 @@ class cartController {
         } else{
             resp.status(500).send({status:'error', message:"No existen carritos con ese ID elegido"})
         }
+    }
+    buyCart=async (req,resp)=>{
+        const cid=req.params.cid
+        const carrito = await this.CM.buyCart(cid)
+        console.log('carrito soy ' + await carrito)
+        if (carrito == false){
+            resp.status(500).send({status:'error', message:"No existen carritos con ese ID elegido"})
+        }else{
+            resp.send({status:'OK', message:"Compra realizada con exito", payload:carrito})
+        }
+
     }
 }
 

@@ -160,7 +160,7 @@ class cartManager{
         // como me traer un array en vez del objeto directamente, tomo la posicion 0 para tener el objeto
         let objCart = await cartId[0]
         if(objCart){
-            await cartModel.updateOne({_id:cid},products)
+            await cartModel.updateOne({_id:cid},{products:products})
             return ("carritoActualizado")
         }else{
             return ("cidNotFound")
@@ -168,11 +168,36 @@ class cartManager{
     
             
     }
+
+    async buyCart (cid){
+        console.log('soy el ID ' + cid)
+        const carrito = await this.getCartById(cid)
+        console.log(carrito)
+        const objectCart= await carrito[0]
+        console.log(await objectCart.products)
+        if (carrito == false){
+           return false
+        }else{
+            let listaCompra=[]
+            let listaNoCompra=[]
+            await objectCart.products.map((data)=>{
+                if (data.product.stock > data.quantity){
+                    listaCompra.push(data)
+                    let newStock=data.product.stock-data.quantity
+                    PM.updateStock(data.product._id,newStock)
+                }else{
+                    listaNoCompra.push(data)
+                }
+            })
+            await this.updateCart(cid, listaNoCompra)
+            return ({purchaseProd:listaCompra, notPurchaseProd:listaNoCompra})
+        }
+        
+        
+    }
     
 
 }
-
-
 
 
 export default cartManager

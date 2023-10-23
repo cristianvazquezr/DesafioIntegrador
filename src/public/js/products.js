@@ -68,6 +68,28 @@ async function validarCarrito(){
         })
        let objCart = await createCart.json()
        idCart=await objCart._id
+
+       //consulto el usuario al current
+       let getUser = await fetch('api/session/current', {
+            method:'get',
+            headers: {
+                "Content-Type": "application/json",
+            }
+        })
+        let datos = await getUser.json()
+        user=await datos.datos.email
+
+        console.log("hola soy el user " + user)
+
+       //agrego el carrito al usuario
+       let addCart = await fetch(`api/user/${user}/cart/${idCart}`, {
+            method:'post',
+            headers: {
+                "Content-Type": "application/json",
+            }
+        })
+
+        console.log(await addCart)
     }
     sessionStorage.setItem('carrito',JSON.stringify(idCart));
     return idCart

@@ -14,12 +14,26 @@ const userSchema=new mongoose.Schema({
         default:"user",
         enum:['user','admin']
     },
+
     cart:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'carts'
+        type:[
+            {
+                cart:{
+                    type:mongoose.Schema.Types.ObjectId,
+                    ref:'carts'
+                }
+            }
+        ]
+       
     }
 
 })
+
+userSchema.pre('find',function(){
+
+    this.populate("cart.cart")
+    
+  })
 
 export const userModel=mongoose.model("users", userSchema)
 

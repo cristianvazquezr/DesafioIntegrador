@@ -41,7 +41,7 @@ viewsRouter.get('/products',auth, VC.products)
 
 viewsRouter.get('/realtimeproducts',authorization('admin'),VC.realTimeProducts)
 
-viewsRouter.get('/chat',auth,VC.chat)
+viewsRouter.get('/chat',authorization('user'),VC.chat)
 
 viewsRouter.get('/cart/:cid', auth,VC.cart)
 
@@ -53,5 +53,6 @@ viewsRouter.get('/profile',VC.profile)
 
 viewsRouter.get('/restore',VC.restore)
 
+viewsRouter.get('/purchase/:tid',VC.purchase)
 
 export default viewsRouter  

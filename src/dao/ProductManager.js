@@ -189,6 +189,18 @@ class ProductManager{
         return false
     }}
 
+    async updateStock(id,stock){
+        let Product=await this.getProductById(id)
+
+        if (Product){
+            await productModel.updateOne({_id:id},{stock:stock} )
+            return true
+        }else{
+            return false
+        }
+
+    }
+
 }
 
 

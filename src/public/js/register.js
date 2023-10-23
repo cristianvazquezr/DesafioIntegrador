@@ -52,7 +52,7 @@ async function register(){
         email:email,
         age:edad,
         password:contrasena,
-        role:role
+        role:role,
     }
 
     let consulta = await fetch(`http://localhost:8080/api/session/register`,{

@@ -1,4 +1,5 @@
 import { createHash, isValidPassword } from "../utils.js"
+import { cartModel } from "./models/cart.model.js"
 import { userModel } from "./models/user.model.js"
 
 class userMananger{
@@ -9,11 +10,11 @@ class userMananger{
 
     async getUserById(id){
 
-        // llamo la funcion para obtener los productos y buscar por id
+        // llamo la funcion para obtener los usuarios y buscar por id
     
         const usuarioBuscado=await userModel.find({_id:id})
-        if(await productoBuscado!=undefined){
-            return (await productoBuscado) 
+        if(await usuarioBuscado!=undefined){
+            return (await usuarioBuscado) 
         }
         else{
         console.log("Not found")
@@ -75,7 +76,7 @@ class userMananger{
 
     async addUser(first_name,last_name, email, age, password,role){
         //creo un objeto nuevo con atributos nuevos
-        let user1= {first_name:first_name,last_name:last_name,email:email,age:age,password:createHash(password),role:role}
+        let user1= {first_name:first_name,last_name:last_name,email:email,age:age,password:createHash(password),role:role, cart:[]}
         //creo un array con los valores de ese nuevo objeto
         let valores =[user1.first_name,user1.last_name,user1.email,user1.age,user1.password,user1.role]
         //corroboro que no haya ningun valor vacio dentro de ese array
@@ -142,6 +143,27 @@ class userMananger{
         await userModel.updateOne({email:user},userRestore)
 
         return userRestore
+    }
+
+    //agregar carrito
+
+    async addCart(cartId, user){
+        const cartFind=await cartModel.findOne({_id:cartId}).lean()|| null
+        const userUpdate=await userModel.findOne({email:user}).lean() || null
+
+        if (await userUpdate==null){
+            return "invalidUser"
+        }
+
+        if (await cartFind==null){
+            return "invalidCart"
+        }else{
+            userUpdate.cart=[{cart:cartId}]
+            console.log(userUpdate.cart)
+            console.log(cartId)
+            await userModel.updateOne({email:user},{cart:userUpdate.cart})
+            return ('cartAgregado')
+        }
     }
 
 }

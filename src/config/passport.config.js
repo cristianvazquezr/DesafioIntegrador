@@ -13,7 +13,6 @@ let UM = new userMananger()
 const localStrategy=local.Strategy;
 const JWTStrategy=jwt.Strategy
 const extractJWT=jwt.ExtractJwt
-
 const cookieExtractor=(req)=>{
     let token=null
     if(req && req.cookies){
@@ -50,7 +49,8 @@ const initiliazePassport=()=>{
                     age:"",
                     email:profile._json.email,
                     password:'',
-                    admin:false
+                    role:"user",
+                    cart:[]
                 }
                 let result=await userModel.create(newUser)
                return done(null, result)
@@ -78,6 +78,7 @@ const initiliazePassport=()=>{
                     age,
                     password:createHash(password),
                     role,
+                    cart:[]
                 }
                 let result=await userModel.create(newUser)
                 return done(null,result)
