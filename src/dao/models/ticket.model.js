@@ -2,6 +2,8 @@ import mongoose from "mongoose";
 
 
 const ticketSchema=new mongoose.Schema({
+  code:String,
+  purchase_date:Date,
  purchesedProducts:{
     type:[
         {

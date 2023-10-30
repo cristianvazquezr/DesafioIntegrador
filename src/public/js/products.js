@@ -77,7 +77,7 @@ async function validarCarrito(){
             }
         })
         let datos = await getUser.json()
-        user=await datos.datos.email
+        user=await datos.datos[0].email
 
         console.log("hola soy el user " + user)
 

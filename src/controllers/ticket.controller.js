@@ -20,8 +20,9 @@ class ticketController{
         let purchasedProduct= await purchasedCart.purchaseProd
         let notPurchasedProduct= await purchasedCart.notPurchaseProd
         let newTicket=await this.TM.createTicket(purchasedProduct,notPurchasedProduct,idUser)
+        console.log('soy el id del ticket ' + newTicket._id);
         //resp.redirect(`http://localhost:8080/purchase/${newTicket._id}`)
-        resp.send({status:'OK', message:'Se realizo la compra con exito'})
+        resp.send({status:'OK', message:'Se realizo la compra con exito', idTicket:await newTicket._id})
     }
 } 
 

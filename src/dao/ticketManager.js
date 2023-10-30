@@ -1,3 +1,4 @@
+import { now } from "mongoose";
 import { ticketModel } from "./models/ticket.model.js";
 import userMananger from "./userMananger.js";
 
@@ -10,12 +11,28 @@ class ticketManager{
 
     async createTicket(purchaseProducts,notPurchaseProducts,idClient){
         let client= await UM.getUserById(idClient) || null
+        
+
 
         if (!client){
             return false
         }
         else{
-            const newTicket= await ticketModel.create({purchesedProducts:purchaseProducts,notPurchesedProducts:notPurchaseProducts,client:idClient})
+
+            let date=new Date()
+            let fecha =date.getDate(now())
+            //para generar el numero aleatorio debo chequear que no exista en la lista de code de los ticket.
+            let code = Math.floor(Math.random() * 100000000000000000)
+            let clientList=await ticketModel.find().lean()
+            let codeList=clientList.map((element)=>{
+                element.code
+            })
+
+            while(codeList.includes(code)){
+                code = Math.floor(Math.random() * 100000000000000000)
+            }
+
+            const newTicket= await ticketModel.create({purchase_date:fecha,code:code,purchesedProducts:purchaseProducts,notPurchesedProducts:notPurchaseProducts,client:idClient})
             return newTicket
         }
     }

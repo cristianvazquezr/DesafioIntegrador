@@ -71,3 +71,16 @@ async function logout(){
 
 let logoutElement = document.getElementById("logout")
 logoutElement.onclick=logout
+
+async function purchase(){
+    idCart=await JSON.parse(sessionStorage.getItem('carrito'))
+    let purchase=await fetch(`/api/carts/${idCart}/purchase`, {
+        method:'post',
+    })
+    let purchaseObj=await purchase.json()
+    let idPurchase=await purchaseObj.idTicket
+    location.href=`http://localhost:8080/purchase/${idPurchase}`
+}
+
+let endPurchase = document.getElementById("purchase")
+endPurchase.onclick=purchase

@@ -89,9 +89,10 @@ class viewsController{
         let respuesta=await this.TM.getTicketById(tid)
         console.log(respuesta)
         resp.render("ticket",{
+            fecha:respuesta.purchase_date,
             nameClient:nameLogged,
             lastNameCLient:lastNameLogged,
-            idBuy:tid,
+            idBuy:respuesta.code,
             productos:respuesta.purchesedProducts,
             sinStock:respuesta.notPurchesedProducts,
             style:"../../css/style.css",

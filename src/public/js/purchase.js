@@ -69,24 +69,40 @@ async function logout(){
 
 }
 
+// async function purchase(){
+//     let cartUser= await JSON.parse(sessionStorage.getItem('carrito'))
+//     try{
+//         await fetch(`/api/carts/${cartUser}/purchase`, {
+//         method:'post',
+//         })
+//         console.log("compra finalizada")
+//         let purchase=await fetch(`/api/carts/${cartUser}/purchase`, {
+//             method:'post',
+//         })
+        
+        
+//     }catch(err){
+//         console.log("fallo " + err)
+//     }
+
+
+// }
+
+
 async function purchase(){
-    let cartUser= await JSON.parse(sessionStorage.getItem('carrito'))
-    try{
-        await fetch(`/api/carts/${cartUser}/purchase`, {
+    idCart=await JSON.parse(sessionStorage.getItem('carrito'))
+    let purchase=await fetch(`/api/carts/${idCart}/purchase`, {
         method:'post',
-        })
-        console.log("compra finalizada")
-        let purchase=await fetch(`/api/carts/${cartUser}/purchase`, {
-            method:'post',
-        })
-        
-        
-    }catch(err){
-        console.log("fallo " + err)
-    }
-
-
+    })
+    let purchaseObj=await purchase.json()
+    let idPurchase=await purchaseObj.idTicket
+    location.href=`http://localhost:8080/purchase/${idPurchase}`
 }
+
+
+
+
+
 
 //hago la multiplicacion de dos campos para el total
 
@@ -103,6 +119,19 @@ window.onload=function () {
     
 }
 
+//agrego el ID al href del navbar para redirigir al carrito
+
+async function hrefCarrito(){
+    let hrefCarrito=document.getElementById("carrito")
+    let idCarrito=await JSON.parse(sessionStorage.getItem('carrito'))
+    if (idCarrito){
+        hrefCarrito.href= `http://localhost:8080/cart/${await idCarrito}`
+    }else{
+        hrefCarrito.href= '' 
+    }
+}
+
+hrefCarrito()
 
 
 let purchaseElement = document.getElementById("purchase")

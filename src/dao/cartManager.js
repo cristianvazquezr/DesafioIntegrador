@@ -189,6 +189,8 @@ class cartManager{
                     listaNoCompra.push(data)
                 }
             })
+            console.log(listaCompra)
+            console.log(listaNoCompra)
             await this.updateCart(cid, listaNoCompra)
             return ({purchaseProd:listaCompra, notPurchaseProd:listaNoCompra})
         }

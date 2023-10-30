@@ -1,8 +1,8 @@
-import { messageModel } from "../dao/models/message.model.js";
+import messageMananger from "../dao/messageManager.js"
 
 class messageController{
     constructor(){
-        this.MM = new messageModel()
+        this.MM = new messageMananger()
     }
     getMessage=async (req, resp)=>{
         resp.send(await this.MM.getMessage())
