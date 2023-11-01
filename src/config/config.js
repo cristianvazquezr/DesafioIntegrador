@@ -1,5 +1,20 @@
+import {Command}  from 'commander';
 import dotenv from 'dotenv';
-dotenv.config({path:"./config/.env"});
+
+// aplico los comandos de node
+
+const program = new Command()
+
+program.option('--mode <mode>', 'Modo de trabajo', "desarrollo")
+
+program.parse()
+
+console.log(program.opts())
+
+let entorno=program.opts().mode
+
+dotenv.config({
+    path: entorno== "desarrollo" ? "./config/.env.devop" : "./config/.env.prod"});
 
 export default{
     port:process.env.PORT,

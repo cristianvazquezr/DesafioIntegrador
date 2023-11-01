@@ -21,6 +21,7 @@ import config from './config/config.js'
 import userRouter from './Routes/user.router.js'
 import mockingRouter from './Routes/mocking.router.js'
 import errorHandler from './services/errors/middlewares/index.js'
+
 //Creo el servidor
 
 console.log(config);

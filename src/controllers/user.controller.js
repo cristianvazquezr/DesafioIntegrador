@@ -4,6 +4,7 @@ import CustomError from "../services/errors/CustomErrors.js";
 import { generateUserErrorInfo, searchedUserErrorInfo } from "../services/messages/messages.js";
 import EErrors from "../services/errors/enums.js";
 import { userModel } from "../dao/models/user.model.js";
+import { tr } from "@faker-js/faker";
 
 class userController {
     constructor(){
@@ -69,11 +70,18 @@ class userController {
         console.log('hola')
         let uid=req.params.uid
         console.log(uid)
-        let searchedUser= await userModel.findOne({_id:uid}).lean() || null
+        let searchedUser=''
+        try{
+            searchedUser= await userModel.findOne({_id:uid}).lean() || null
+        }
+        catch{
+            searchedUser= null
+        }
+        
         if (!uid || !searchedUser){
             CustomError.createError({
                 name:"searched user error",
-                cause:searchedUserErrorInfo({uid}),
+                cause:searchedUserErrorInfo(uid),
                 message:"Error al buscar usuario",
                 code:EErrors.INVALID_PARAM
             }
