@@ -1,8 +1,9 @@
 import userMananger from "../dao/userMananger.js";
 import {generateToken} from '../utils.js'
 import CustomError from "../services/errors/CustomErrors.js";
-import { generateUserErrorInfo } from "../services/messages/messages.js";
+import { generateUserErrorInfo, searchedUserErrorInfo } from "../services/messages/messages.js";
 import EErrors from "../services/errors/enums.js";
+import { userModel } from "../dao/models/user.model.js";
 
 class userController {
     constructor(){
@@ -40,45 +41,45 @@ class userController {
     }
     registrationWithHandleError=async (req, resp)=>{
         let{first_name,last_name, email, age, role}=req.body
-        let searchedUser=await userModel.findOne({email:username})
+        let searchedUser=await userModel.findOne({email:email})
         //aplico el custom error para sguimiento de errores
-        if (!first_name || !last_name || !email || !age || !role){
+        if (!first_name || !last_name || !email || !age || !role || searchedUser){
             CustomError.createError({
                 name:"user creation error",
                 cause:generateUserErrorInfo({first_name,last_name, email, age}),
+                message:"Error al crear usuario",
                 code:EErrors.INVALID_TYPES_ERROR
             }
             )
-        }else if(!searchedUser){
+        }
+        const newUser={
+        first_name,
+        last_name,
+        email,
+        age,
+        password:createHash(password),
+        role,
+        cart:[]
+        }
+        let result=await userModel.create(newUser)
+        resp.send({status:'ok', message: 'se creo el usuario con exito', payload:result})
+    }
+
+    getUserById = async(req,resp)=>{
+        console.log('hola')
+        let uid=req.params.uid
+        console.log(uid)
+        let searchedUser= await userModel.findOne({_id:uid}).lean() || null
+        if (!uid || !searchedUser){
             CustomError.createError({
-                name:"searched User error",
-                cause:searchedUserErrorInfo({first_name,last_name, email, age}),
-                code:EErrors.INVALID_TYPES_ERROR
-            })
-        }
-
-        try{
-            let user=await userModel.findOne({email:username})
-            if(user){
-                console.log("ya existe el usuario")
-                return done(null, false)
+                name:"searched user error",
+                cause:searchedUserErrorInfo({uid}),
+                message:"Error al buscar usuario",
+                code:EErrors.INVALID_PARAM
             }
-            const newUser={
-                first_name,
-                last_name,
-                email,
-                age,
-                password:createHash(password),
-                role,
-                cart:[]
-            }
-            let result=await userModel.create(newUser)
-            return done(null,result)
-        }catch (error){
-            return done("error al obtener el usuario: " + error)
+            )
         }
-    
-
+        resp.send({status:'ok', message: 'se encontro el usuario', payload:searchedUser})
     }
 
     register=async (req, res)=>{

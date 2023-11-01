@@ -10,4 +10,8 @@ const userRouter=Router()
 
 userRouter.post('/user/:email/cart/:cid',UC.addCart)
 
+userRouter.post('/user/register',UC.registrationWithHandleError)
+
+userRouter.get('/user/:uid',UC.getUserById)
+
 export default userRouter

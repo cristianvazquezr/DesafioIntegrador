@@ -73,6 +73,7 @@ const initiliazePassport=()=>{
                 CustomError.createError({
                     name:"user creation error",
                     cause:generateUserErrorInfo({first_name,last_name, email, age}),
+                    message:"Error al crear usuario",
                     code:EErrors.INVALID_TYPES_ERROR
                 }
                 )
