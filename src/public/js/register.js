@@ -6,7 +6,6 @@ let cantidadCarrito=document.getElementById("numerito")
 async function countItemCart(){
 
     let cartUser= await JSON.parse(sessionStorage.getItem('carrito'))
-    console.log(await cartUser)
     let idCart=''
     if(cartUser){
         idCart=await cartUser

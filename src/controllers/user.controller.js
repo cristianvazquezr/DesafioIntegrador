@@ -1,5 +1,8 @@
 import userMananger from "../dao/userMananger.js";
 import {generateToken} from '../utils.js'
+import CustomError from "../services/errors/CustomErrors.js";
+import { generateUserErrorInfo } from "../services/messages/messages.js";
+import EErrors from "../services/errors/enums.js";
 
 class userController {
     constructor(){
@@ -34,6 +37,48 @@ class userController {
         const access_token=generateToken(req.user)
         res.cookie("cookieEcommerce", access_token, {maxAge:3600000, httpOnly:true}).redirect('/products')
         
+    }
+    registrationWithHandleError=async (req, resp)=>{
+        let{first_name,last_name, email, age, role}=req.body
+        let searchedUser=await userModel.findOne({email:username})
+        //aplico el custom error para sguimiento de errores
+        if (!first_name || !last_name || !email || !age || !role){
+            CustomError.createError({
+                name:"user creation error",
+                cause:generateUserErrorInfo({first_name,last_name, email, age}),
+                code:EErrors.INVALID_TYPES_ERROR
+            }
+            )
+        }else if(!searchedUser){
+            CustomError.createError({
+                name:"searched User error",
+                cause:searchedUserErrorInfo({first_name,last_name, email, age}),
+                code:EErrors.INVALID_TYPES_ERROR
+            })
+        }
+
+        try{
+            let user=await userModel.findOne({email:username})
+            if(user){
+                console.log("ya existe el usuario")
+                return done(null, false)
+            }
+            const newUser={
+                first_name,
+                last_name,
+                email,
+                age,
+                password:createHash(password),
+                role,
+                cart:[]
+            }
+            let result=await userModel.create(newUser)
+            return done(null,result)
+        }catch (error){
+            return done("error al obtener el usuario: " + error)
+        }
+    
+
     }
 
     register=async (req, res)=>{

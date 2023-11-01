@@ -6,6 +6,9 @@ import { isValidPassword } from "../utils.js";
 import userMananger from "../dao/userMananger.js";
 import GitHubStategy from 'passport-github2'
 import jwt from "passport-jwt";
+import CustomError from "../services/errors/CustomErrors.js";
+import { generateUserErrorInfo } from "../services/messages/messages.js";
+import EErrors from "../services/errors/enums.js";
 
 
 let UM = new userMananger()
@@ -65,6 +68,16 @@ const initiliazePassport=()=>{
     passport.use('register',new localStrategy(
         {passReqToCallback:true,usernameField:"email"},async (req,username,password,done)=>{
             let{first_name,last_name, email, age, role}=req.body
+            //aplico el custom error para sguimiento de errores
+            if (!first_name || !last_name || !email || !age || !role){
+                CustomError.createError({
+                    name:"user creation error",
+                    cause:generateUserErrorInfo({first_name,last_name, email, age}),
+                    code:EErrors.INVALID_TYPES_ERROR
+                }
+                )
+            }
+
             try{
                 let user=await userModel.findOne({email:username})
                 if(user){

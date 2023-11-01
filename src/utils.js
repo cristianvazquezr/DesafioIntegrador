@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken"
 import passport from "passport"
 
 
+
 //codigo para JWT
 
 const private_key='secr3to'
