@@ -21,6 +21,7 @@ import config from './config/config.js'
 import userRouter from './Routes/user.router.js'
 import mockingRouter from './Routes/mocking.router.js'
 import errorHandler from './services/errors/middlewares/index.js'
+import { addlogger } from './config/logger.js'
 
 //Creo el servidor
 
@@ -68,6 +69,11 @@ app.use("/api", userRouter)
 app.use("/api", mockingRouter)
 app.use("/", messageRouter)
 app.use(errorHandler)
+app.use(addlogger)
+
+app.get("/api/logger", async (req,res)=>{
+    res.send("prueba logger")
+})
 
 
 

@@ -12,6 +12,7 @@ const errorHandler=(error, req, res, next)=>{
         default:
             res.status(500).send({status:'error', error: 'ahundled error'})
     }
+    next()
 }
 
 export default errorHandler

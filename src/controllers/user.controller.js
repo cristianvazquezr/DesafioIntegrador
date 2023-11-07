@@ -67,9 +67,7 @@ class userController {
     }
 
     getUserById = async(req,resp)=>{
-        console.log('hola')
         let uid=req.params.uid
-        console.log(uid)
         let searchedUser=''
         try{
             searchedUser= await userModel.findOne({_id:uid}).lean() || null

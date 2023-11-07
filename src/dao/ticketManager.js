@@ -12,15 +12,13 @@ class ticketManager{
     async createTicket(purchaseProducts,notPurchaseProducts,idClient){
         let client= await UM.getUserById(idClient) || null
         
-
-
         if (!client){
             return false
         }
         else{
-
+ 
             let date=new Date()
-            let fecha =date.getDate(now())
+            let fecha =`${date.toLocaleDateString()}  ${date.toLocaleTimeString()}`
             //para generar el numero aleatorio debo chequear que no exista en la lista de code de los ticket.
             let code = Math.floor(Math.random() * 100000000000000000)
             let clientList=await ticketModel.find().lean()

@@ -14,11 +14,12 @@ console.log(program.opts())
 let entorno=program.opts().mode
 
 dotenv.config({
-    path: entorno== "desarrollo" ? "./config/.env.devop" : "./config/.env.prod"});
+    path: entorno == "desarrollo" ? "./config/.env.devop" : "./config/.env.prod"});
 
 export default{
     port:process.env.PORT,
     mongoURL:process.env.MONGO_URL,
     adminUser:process.env.ADMIN_NAME,
-    adminPass:process.env.ADMIN_PASS
+    adminPass:process.env.ADMIN_PASS,
+    enviroment:process.env.ENVIROMENT
 }
