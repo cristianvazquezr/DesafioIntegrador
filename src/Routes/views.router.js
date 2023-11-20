@@ -1,6 +1,6 @@
 import { Router } from "express"
 import viewsController from "../controllers/views.controller.js"
-import { authorization } from "../utils.js"
+import { authorization, authorizationAdminPremium, } from "../utils.js"
 //creo el middleware para autenticar administrador
 function authAdmin(req, res, next) {
     if (req?.admin) {
@@ -23,9 +23,17 @@ function authLogin(req, res, next) {
 
     if (req.user) {
         res.redirect("/products")
-        return res.status(401).send('error de autorización!')
     }
     return next()
+}
+
+//creo el middleware para autorizar cambio de contrasena
+function authRestaurar(req, res, next) {
+
+    if (req.cookies.cambiarPass) {
+        return next()
+    }
+    res.redirect("/products")
 }
 
 
@@ -39,7 +47,7 @@ viewsRouter.get('/',VC.home)
 
 viewsRouter.get('/products',auth, VC.products)
 
-viewsRouter.get('/realtimeproducts',authorization('admin'),VC.realTimeProducts)
+viewsRouter.get('/realtimeproducts',authorizationAdminPremium(),VC.realTimeProducts)
 
 viewsRouter.get('/chat',authorization('user'),VC.chat)
 
@@ -47,11 +55,15 @@ viewsRouter.get('/cart/:cid', auth,VC.cart)
 
 viewsRouter.get('/login',authLogin ,VC.login)
 
-viewsRouter.get('/register',authLogin,VC.register)
+viewsRouter.get('/register',VC.register)
 
 viewsRouter.get('/profile',VC.profile)
 
 viewsRouter.get('/restore',VC.restore)
+
+viewsRouter.get('/recuperar',authRestaurar,VC.recuperar)
+
+viewsRouter.get('/emailRecuperarPass',VC.emailRecuperarPass)
 
 viewsRouter.get('/purchase/:tid',VC.purchase)
 

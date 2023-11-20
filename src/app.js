@@ -22,92 +22,126 @@ import userRouter from './Routes/user.router.js'
 import mockingRouter from './Routes/mocking.router.js'
 import errorHandler from './services/errors/middlewares/index.js'
 import { addlogger } from './config/logger.js'
-
-//Creo el servidor
-
-console.log(config);
-
-const puerto=config.port
-
-const app=express()
-
-const httpServer= app.listen(puerto,async ()=>{
-    console.log(`servidor conectado al puerto ${puerto}`)
-})
-const socketServer = new Server(httpServer)
-
-mongoose.connect(config.mongoURL) 
-
-app.use(express.static(__dirname + "/public"))
-app.engine("handlebars",expressHandlebars.engine({
-    handlebars: allowInsecurePrototypeAccess(Handlebars)
-}))
-app.set("views",__dirname+"/views" )
-app.set("view engine","handlebars")
-app.use(express.urlencoded({extended:true}))
-app.use(express.json())
-app.use(session({
-    store:MongoStore.create({
-        mongoUrl:config.mongoURL,
-        mongoOptions:{useNewUrlParser:true,useUnifiedTopology:true},
-        ttl:15000,
-    }),
-    secret:"cr1st14n",
-    resave:false,
-    saveUninitialized:false
-}))
-app.use(cookieParser())
-initiliazePassport();
-app.use(passport.initialize());
-app.use(passport.session());
-
-app.use("/", viewsRouter)
-app.use("/api", productRouter)
-app.use("/api", cartRouter)
-app.use("/api", sessionRouter)
-app.use("/api", userRouter)
-app.use("/api", mockingRouter)
-app.use("/", messageRouter)
-app.use(errorHandler)
-app.use(addlogger)
-
-app.get("/api/logger", async (req,res)=>{
-    res.send("prueba logger")
-})
+import cluster from "cluster"
+import { cpus } from 'os'
+import MongoSingleton from './config/mongoSingleton.js'
+import mailRouter from './Routes/mail.router.js'
 
 
-
-
-// instancio la clase para poder enviar a todos los clientes los productos
-
-
-socketServer.on('connection',async socket=>{
-    let PM = new ProductManager()
-    let productos= await PM.getProducts({limit:'', page:'', query:'', sort:''})
-    let MM = new messageMananger()
-    let mensajes = await MM.getMessage()
-    console.log("nueva conexion realizada")
-    socketServer.emit("productos",productos)
-    socketServer.emit("mensajes",mensajes)
-
-    socket.on("agregarProducto", async(product)=>{
-        let PM = new ProductManager()
-        await PM.addProduct(product.title, product.description, product.category, product.price, product.thumbnail, product.code, product.stock);
-        let productos= await PM.getProducts({limit:'', page:'', query:'', sort:''})
-        socketServer.emit("productos",productos);    
-    });
-    
-    socket.on("eliminarProducto",async(id)=>{
-        let PM = new ProductManager()
-        await PM.deleteProduct(id)
-        let PmNEW = new ProductManager()
-        let productos=await PmNEW.getProducts({limit:'', page:'', query:'', sort:''})
-        socketServer.emit("productos",productos); 
+// corroboro si es proceso primario
+if (cluster.isPrimary){
+    console.log('es el proceso primario')
+    const numeroDeProcesadores=cpus().length
+    console.log('Numero de procesadores: ' + numeroDeProcesadores)
+    for (let i=0; i<1; i++){
+        cluster.fork()
+    }
+    cluster.on('message', worker => {
+        console.log('mensaje recibido desde el worker ' + worker.process.pid);
     })
-    socket.on("newMessage",async(message)=>{
+
+    cluster.on('disconnect',worker => {
+        cluster.fork()
+    })
+
+
+}else{
+    console.log('soy un worker con el ID de proceso ' + process.pid )
+
+    //Creo el servidor
+
+    console.log(config);
+
+    const puerto=config.port
+
+    const app=express()
+
+    const httpServer= app.listen(puerto,async ()=>{
+        console.log(`servidor conectado al puerto ${puerto}`)
+    })
+    const socketServer = new Server(httpServer)
+
+    const mongoInstance = async () => {
+
+        try {
+            await MongoSingleton.getInstance();
+        } catch (error) {
+            console.error(error);
+        }
+    };
+    mongoInstance();
+
+    app.use(express.static(__dirname + "/public"))
+    app.engine("handlebars",expressHandlebars.engine({
+        handlebars: allowInsecurePrototypeAccess(Handlebars)
+    }))
+    app.set("views",__dirname+"/views" )
+    app.set("view engine","handlebars")
+    app.use(express.urlencoded({extended:true}))
+    app.use(express.json())
+    app.use(session({
+        store:MongoStore.create({
+            mongoUrl:config.mongoURL,
+            mongoOptions:{useNewUrlParser:true,useUnifiedTopology:true},
+            ttl:15000,
+        }),
+        secret:"cr1st14n",
+        resave:false,
+        saveUninitialized:false
+    }))
+    app.use(cookieParser())
+    initiliazePassport();
+    app.use(passport.initialize());
+    app.use(passport.session());
+
+    app.use("/", viewsRouter)
+    app.use("/api", productRouter)
+    app.use("/api", cartRouter)
+    app.use("/api", sessionRouter)
+    app.use("/api", userRouter)
+    app.use("/api", mockingRouter)
+    app.use("/api", mailRouter)
+    app.use("/", messageRouter)
+    app.use(errorHandler)
+    app.use(addlogger)
+    app.get("/api/logger", async (req,res)=>{
+        res.send("prueba logger")
+    })
+
+    // instancio la clase para poder enviar a todos los clientes los productos
+
+
+    socketServer.on('connection',async socket=>{
+        let PM = new ProductManager()
+        let productos= await PM.getProducts({limit:'100000', page:'', query:'', sort:''})
         let MM = new messageMananger()
-        await MM.createMessage(message.user,message.message)
-        let newMessage=await MM.getMessage()
-        socketServer.emit("mensajes",newMessage); 
-    })
-});
+        let mensajes = await MM.getMessage()
+        console.log("nueva conexion realizada")
+        socketServer.emit("productos",productos)
+        socketServer.emit("mensajes",mensajes)
+
+        socket.on("agregarProducto", async()=>{
+            let PM = new ProductManager()
+            //await PM.addProduct(product.title, product.description, product.category, product.price, product.thumbnail, product.code, product.stock, product.owner);
+            let productos= await PM.getProducts({limit:"100000", page:'', query:'', sort:''})
+            socketServer.emit("productos",productos);    
+        });
+        
+        socket.on("eliminarProducto",async()=>{           
+            let PmNEW = new ProductManager()
+            let productos=await PmNEW.getProducts({limit:"100000", page:'', query:'', sort:''})
+            socketServer.emit("productos",productos); 
+        })
+        socket.on("newMessage",async(message)=>{
+            let MM = new messageMananger()
+            await MM.createMessage(message.user,message.message)
+            let newMessage=await MM.getMessage()
+            socketServer.emit("mensajes",newMessage); 
+        })
+    });
+
+}
+
+
+
+

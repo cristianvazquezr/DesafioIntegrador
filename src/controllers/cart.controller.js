@@ -55,13 +55,17 @@ class cartController {
         const cid=req.params.cid
         const pid=req.params.pid
         const {quantity}=req.body
-        const agregarProducto = await this.CM.addProduct(cid, pid, quantity)
+        const email=req.user.email
+        const agregarProducto = await this.CM.addProduct(cid, pid, quantity, email)
     
         if((await agregarProducto=='productoAgregado')){
             resp.send("se agrego el producto correctamente")
         }else if(await agregarProducto=="pidNotFound"){
             resp.status(500).send({status:'error', message:"no se encontro el producto con ese id"})
-        }else{
+        }else if(await agregarProducto=='sameOwner'){
+            resp.status(500).send({status:'error', message:"no puede agregar al carrito su propio producto"})
+        }
+        else{
             resp.status(500).send({status:'error', message:"no se encontro el carrito con ese id"})
         } 
     }

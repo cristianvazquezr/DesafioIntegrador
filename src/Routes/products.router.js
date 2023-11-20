@@ -1,6 +1,6 @@
 import { Router } from "express"
 import ProductController from "../controllers/Products.controller.js"
-import { authorization } from "../utils.js"
+import { authorization, authorizationAdminPremium } from "../utils.js"
 
 
 //instancio la clase ProductController

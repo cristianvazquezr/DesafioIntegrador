@@ -91,7 +91,8 @@ async function logout(){
 
 async function purchase(){
     idCart=await JSON.parse(sessionStorage.getItem('carrito'))
-    let purchase=await fetch(`/api/carts/${idCart}/purchase`, {
+    let purchase=await fetch(`/api/carts/${idCart}/purchase`,
+     {
         method:'post',
     })
     let purchaseObj=await purchase.json()
@@ -136,3 +137,23 @@ hrefCarrito()
 
 let purchaseElement = document.getElementById("purchase")
 purchaseElement.onclick=purchase
+
+//recuperar contrasena
+
+async function cambiarPass(){
+    try{
+        let email=await fetch(`/api/email`, {
+        method:'get',
+        })
+        console.log(email.status + ' ' + email.message)
+        console.log("Correo Enviado")
+    }catch(err){
+        console.log("fallo " + err)
+    }
+}
+
+let restoreElement = document.getElementById("RecuperarPass")
+restoreElement.onclick=(event)=>{
+    event.preventDefault()
+    cambiarPass()
+}

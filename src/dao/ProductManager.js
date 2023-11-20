@@ -1,5 +1,6 @@
 import { json } from 'express';
 import { productModel  } from './models/product.model.js'
+import { userModel } from './models/user.model.js';
 
 
 class ProductManager{
@@ -10,7 +11,7 @@ class ProductManager{
 
     async getProducts(params){
         let {limit, page, query, sort}=params
-        limit = limit ? limit : 10;
+        limit = limit ? limit : 12;
         page = page ? page : 1;
         // para poder convertir en un objeto el query lo que hago es generar un array del par clave valor y luego lo convierto con la propiedad de OBject. uso una expresion regular en el replace para que le elimine todas las comillas de coca cola
         let clave=query ? query.split(":")[0] : "";
@@ -61,9 +62,9 @@ class ProductManager{
     }
 
 
-    async addProduct(title, description, category, price, thumbnail, code, stock){
+    async addProduct(title, description, category, price, thumbnail, code, stock, owner){
         //creo un objeto nuevo con atributos nuevos
-        let producto1= {title:title,description:description,price:price,thumbnail:thumbnail,code:code,stock:stock, category:category, status:true}
+        let producto1= {title:title,description:description,price:price,thumbnail:thumbnail,code:code,stock:stock, category:category, status:true,owner:owner}
         //creo un array con los valores de ese nuevo objeto, excepto thumbnail por que puede estar vacio
         let valores =[producto1.title,producto1.description,producto1.price,producto1.code,producto1.stock,producto1.category,producto1.status]
         //corroboro que no haya ningun valor vacio dentro de ese array
@@ -116,7 +117,7 @@ class ProductManager{
         }
     }
 
-    async updateProduct(id,title, description, category, price, thumbnail, code, stock){
+    async updateProduct(id,title, description, category, price, thumbnail, code, stock,owner){
         //chequeo que exista el archivo y que lo busque por id
         
         let Product=await this.getProductById(id)
@@ -125,7 +126,7 @@ class ProductManager{
         if (await Product!=false){
 
             //hago todas las validaciones de que no repita el CODE y que se hayan elegido valores para todos los atributos.
-            let producto1={title:title,description:description,price:price,thumbnail:thumbnail,code:code,stock:stock, category:category, status:true}
+            let producto1={title:title,description:description,price:price,thumbnail:thumbnail,code:code,stock:stock, category:category, status:true, owner:owner}
             //creo un array con los valores de ese nuevo objeto
             let valores=[producto1.title,producto1.description,producto1.price,producto1.code,producto1.stock,producto1.category,producto1.status]
             //corroboro que no haya ningun valor vacio dentro de ese array
@@ -175,19 +176,26 @@ class ProductManager{
 
 
     }
-    async deleteProduct(id){
+    async deleteProduct(id,email){
         //chequeo que exista el archivo y que lo busque por id
     
-    let Product=await this.getProductById(id)
-    
-    //valido que exista el id
-    if (await Product!=false){
-        await productModel.deleteOne({_id:id})
-        return true
-    }else{
-        console.log("no se encontro el elemento")
-        return false
-    }}
+        let Product=await this.getProductById(id)
+        let user=await userModel.findOne({email:email})
+        
+        //valido que exista el id
+        if (await Product!=false){
+            if(Product.owner==email || user.role=='admin'){
+                await productModel.deleteOne({_id:id})
+                return true
+            } else{
+                return false
+            }
+            
+        }else{
+            console.log("no se encontro el elemento")
+            return false
+        }
+    }
 
     async updateStock(id,stock){
         let Product=await this.getProductById(id)

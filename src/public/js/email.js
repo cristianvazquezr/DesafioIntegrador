@@ -1,18 +1,3 @@
-//hago la multiplicacion de dos campos para el total
-
-window.onload=function () {
-    countItemCart()
-    let totalPrice=document.getElementsByClassName('totalPrice')
-    console.log(document.getElementsByClassName('price'))
-    for (i in totalPrice){
-        let idProducto=totalPrice[i].id
-        let precio=document.getElementById(`p${idProducto}`)
-        let cantidad=document.getElementById(`q${idProducto}`)
-        totalPrice[i].innerHTML=Number(precio.innerHTML)*Number(cantidad.innerHTML)
-    }
-    
-}
-
 
 //cosulto al session storage si hay carrito, y con un get veo cuantos productos tiene 
 
@@ -92,3 +77,9 @@ restoreElement.onclick=(event)=>{
     cambiarPass()
 }
 
+let enviarCorreo = document.getElementById("enviarCorreo")
+enviarCorreo.onclick=(event)=>{
+    event.preventDefault()
+    cambiarPass()
+}
+ 

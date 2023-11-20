@@ -15,6 +15,7 @@ function handleClick(){
     let category = formularioAdd.elements.category.value;
     let price = formularioAdd.elements.price.value;
     let code = formularioAdd.elements.code.value;
+    let owner = formularioAdd.elements.owner.value;
     const atributos={
         title,
         description,
@@ -23,6 +24,8 @@ function handleClick(){
         category,
         price,
         code,
+        owner,
+
     }
     socket.emit("agregarProducto", atributos);
     
@@ -71,3 +74,20 @@ socket.on("productos",data=>{
     contenedorTabla.innerHTML=contendor
     botonEliminar()
 })
+
+//recuperar contrasena
+
+async function cambiarPass(){
+    try{
+        let email=await fetch(`/api/session/email`, {
+        method:'get',
+        })
+        console.log(email.status + ' ' + email.message)
+        console.log("Correo Enviado")
+    }catch(err){
+        console.log("fallo " + err)
+    }
+}
+
+let logoutElement = document.getElementById("botonRecuperar")
+logoutElement.onclick=cambiarPass

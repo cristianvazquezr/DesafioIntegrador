@@ -26,3 +26,23 @@ botonRegistrar.onclick = (event)=>{
     event.preventDefault()
     location.href='/register'
 }
+
+//recuperar contrasena
+
+async function cambiarPass(){
+    try{
+        let email=await fetch(`/api/email`, {
+        method:'get',
+        })
+        console.log(email.status + ' ' + email.message)
+        console.log("Correo Enviado")
+    }catch(err){
+        console.log("fallo " + err)
+    }
+}
+
+let restoreElement = document.getElementById("RecuperarPass")
+restoreElement.onclick=(event)=>{
+    event.preventDefault()
+    cambiarPass()
+}

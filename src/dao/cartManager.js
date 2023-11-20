@@ -79,26 +79,34 @@ class cartManager{
 
     //agregar un producto al carrito
 
-    async addProduct(cid,pid, quantity){
+    async addProduct(cid,pid, quantity,email){
         //accedo a la lista de productos para ver si existe el id buscado
         const productId= await PM.getProductById(pid)
+        const owner=await productId[0]
         const cartId= await this.getCartById(cid)
         const quantityAdd = quantity ? quantity : 1
+
+        console.log('corroboro igualdad ' + await owner.owner)
         // como me traer un array en vez del objeto directamente, tomo la posicion 0 para tener el objeto
         let objCart = await cartId[0]
         if (objCart){
-            if(productId){
-                let arrayProducts=await objCart.products
-                let positionProduct=await arrayProducts.findIndex(product=>product.product._id==pid)
+            if(await productId){
+                if(await owner.owner!=email){
+                    let arrayProducts=await objCart.products
+                    let positionProduct=await arrayProducts.findIndex(product=>product.product._id==pid)
             
-                if (positionProduct!=-1){
-                    arrayProducts[await positionProduct].quantity=arrayProducts[positionProduct].quantity+quantityAdd
+                    if (positionProduct!=-1){
+                        arrayProducts[await positionProduct].quantity=arrayProducts[positionProduct].quantity+quantityAdd
+                    }
+                    else{
+                        arrayProducts.push({product:pid,quantity:quantityAdd})
+                    }
+                    await cartModel.updateOne({_id:cid},{products:arrayProducts})
+                    return ('productoAgregado')
+                }else{
+                    return('sameOwner')
                 }
-                else{
-                    arrayProducts.push({product:pid,quantity:quantityAdd})
-                }
-                await cartModel.updateOne({_id:cid},{products:arrayProducts})
-                return ('productoAgregado')
+                
                 
             }else{
                 return ('pidNotFound')

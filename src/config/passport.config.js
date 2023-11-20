@@ -52,7 +52,7 @@ const initiliazePassport=()=>{
                     age:"",
                     email:profile._json.email,
                     password:'',
-                    role:"user",
+                    role:'premium',
                     cart:[]
                 }
                 let result=await userModel.create(newUser)

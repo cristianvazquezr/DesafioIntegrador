@@ -27,10 +27,16 @@ class ProductController{
     }
     addProduct= async (req,resp)=>{
     
-        let {title, description, category, price, thumbnail, code, stock}=req.body
-        
+        let {title, description, category, price, thumbnail, code, stock, owner}=req.body
+        let roleUser=req.user.role
+        let email=req.user.email
+        if(roleUser=="premium"){
+            owner=email
+        }else{
+            owner='admin'
+        }
     
-        let productos=await this.PM.addProduct(title, description, category, price, thumbnail, code, stock)
+        let productos=await this.PM.addProduct(title, description, category, price, thumbnail, code, stock, owner)
        
         if(productos=="valorVacio"){
             resp.status(400).send({status:"error", message:"complete los campos obligatorios"})
@@ -38,7 +44,7 @@ class ProductController{
             
             resp.status(400).send({status:"error", message:"ya existe producto con ese code"})
         } else{
-            resp.status(200).send("se agrego correctamente")
+            resp.status(200).send({status:"OK", message:"se agrego correctamente"})
         }
     }
 
@@ -62,14 +68,14 @@ class ProductController{
 
     deleteProduct=async (req,resp)=>{
         const id =req.params.pid
-    
-        let productos=await this.PM.deleteProduct(id)
+        let user = req.user.email
+        let productos=await this.PM.deleteProduct(id,user)
        
         if(productos){
-            resp.status(200).send("se elimino el producto correctamente")
+            resp.status(200).send({status:"OK", message:"se elimino el producto correctamente"})
     
         }else{
-            resp.status(400).send({status:"error", message:"no se encontro el elemento"})
+            resp.status(400).send({status:"error", message:"no se encontro el elemento, o no posee permisos, asegurese de ser administrador o premium"})
         }
     
     }

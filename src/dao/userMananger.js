@@ -145,6 +145,29 @@ class userMananger{
         return userRestore
     }
 
+        // cambiar password
+        async recuperar(user, pass){
+            const userRestore=await userModel.findOne({email:user}).lean() || null
+    
+            if (await userRestore==null){
+                return "invalidUser"
+            }
+
+            console.log('valido el pass ' + isValidPassword(userRestore,pass));
+
+            if(isValidPassword(userRestore,pass)){
+                return "mismoPass"
+            }else{
+                const newPass=createHash(pass)
+    
+                userRestore.password=newPass
+        
+                await userModel.updateOne({email:user},userRestore)
+        
+                return userRestore
+            }
+        }
+
     //agregar carrito
 
     async addCart(cartId, user){

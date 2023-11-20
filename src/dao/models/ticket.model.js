@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 
 const ticketSchema=new mongoose.Schema({
   code:String,
-  purchase_date:Date,
+  purchase_date:String,
  purchesedProducts:{
     type:[
         {
@@ -46,7 +46,7 @@ ticketSchema.pre('findOne',function(){
     this.populate("notPurchesedProducts.product")
     this.populate("client")
     
-  })
+})
 
 
 export const ticketModel=mongoose.model("tickets", ticketSchema)  

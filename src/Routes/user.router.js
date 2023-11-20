@@ -14,4 +14,6 @@ userRouter.post('/user/register',UC.registrationWithHandleError)
 
 userRouter.get('/user/:uid',UC.getUserById)
 
+userRouter.post('/user/premium/:uid',UC.changeRole)
+
 export default userRouter

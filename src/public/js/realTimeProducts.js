@@ -7,7 +7,7 @@ formularioAdd.addEventListener("click", (event)=>{
     event.preventDefault()
 });
 
-function handleClick(){
+async function handleClick(){
     let title = formularioAdd.elements.title.value;
     let description = formularioAdd.elements.description.value;
     let stock = formularioAdd.elements.stock.value;
@@ -15,6 +15,7 @@ function handleClick(){
     let category = formularioAdd.elements.category.value;
     let price = formularioAdd.elements.price.value;
     let code = formularioAdd.elements.code.value;
+    let owner = formularioAdd.elements.owner.value;
     const atributos={
         title,
         description,
@@ -23,8 +24,17 @@ function handleClick(){
         category,
         price,
         code,
+        owner
     }
-    socket.emit("agregarProducto", atributos);
+    let addProduct=await fetch(`api/products/`, {
+        method:'post',
+        body: JSON.stringify(atributos),
+        headers: {
+            "Content-Type": "application/json",
+        }
+    })
+    console.log(await addProduct.message);
+    socket.emit("agregarProducto");
     
     formularioAdd.reset();
 
@@ -45,8 +55,16 @@ function botonEliminar(){
 }
 
 
-function DeleteProduct(idElementoEliminar){
-    socket.emit("eliminarProducto", idElementoEliminar);
+async function  DeleteProduct(idElementoEliminar){
+    //elimino el producto
+    let deleteProduct = await fetch(`api/products/${idElementoEliminar}`, {
+        method:'delete',
+        headers: {
+            "Content-Type": "application/json",
+        }
+    })
+    console.log(await deleteProduct.message);
+    socket.emit("eliminarProducto");
 }
 
 socket.on("productos",data=>{
@@ -64,10 +82,12 @@ socket.on("productos",data=>{
         <td>${element.code}</td>
         <td>${element.stock}</td>
         <td>${element.status}</td>
+        <td>${element.owner}</td>
         <td><button id="${element._id}" class="botonEliminar">🗑️</button></td>
     </tr>
     `
     });
+    
     contenedorTabla.innerHTML=contendor
     botonEliminar()
 })
@@ -92,3 +112,23 @@ async function logout(){
 
 let logoutElement = document.getElementById("logout")
 logoutElement.onclick=logout
+
+//recuperar contrasena
+
+async function cambiarPass(){
+    try{
+        let email=await fetch(`/api/email`, {
+        method:'get',
+        })
+        console.log(email.status + ' ' + email.message)
+        console.log("Correo Enviado")
+    }catch(err){
+        console.log("fallo " + err)
+    }
+}
+
+let restoreElement = document.getElementById("RecuperarPass")
+restoreElement.onclick=(event)=>{
+    event.preventDefault()
+    cambiarPass()
+}

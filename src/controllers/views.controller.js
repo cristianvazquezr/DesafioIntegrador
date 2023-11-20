@@ -27,9 +27,10 @@ class viewsController{
     realTimeProducts = async (req,resp)=>{
 
         let userLogged=req.user.first_name
-    
+        let emailLogged=req.user.email
         resp.render("realTimeProducts",{
             user:userLogged,
+            email:emailLogged,
             style:"style.css"
         })
     }
@@ -77,6 +78,30 @@ class viewsController{
     restore=async (req,resp)=>{
         resp.render("restore",{
             style:"../../css/style.css"
+        })
+    }
+
+    recuperar=async (req,resp)=>{
+
+        let userLogged=req.user.first_name 
+        let emailLogged=req.user.email
+        resp.render("recuperar",{
+            style:"../../css/style.css",
+            user:userLogged,
+            email:emailLogged
+
+        })
+    }
+
+    emailRecuperarPass=async (req,resp)=>{
+
+        let userLogged=req.user.first_name 
+        let emailLogged=req.user.email
+        resp.render("emailRecuperarPass",{
+            style:"../../css/style.css",
+            user:userLogged,
+            email:emailLogged
+
         })
     }
 

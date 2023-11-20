@@ -58,3 +58,24 @@ async function logout(){
 
 let logoutElement = document.getElementById("logout")
 logoutElement.onclick=logout
+
+
+//recuperar contrasena
+
+async function cambiarPass(){
+    try{
+        let email=await fetch(`/api/email`, {
+        method:'get',
+        })
+        console.log(email.status + ' ' + email.message)
+        console.log("Correo Enviado")
+    }catch(err){
+        console.log("fallo " + err)
+    }
+}
+
+let restoreElement = document.getElementById("RecuperarPass")
+restoreElement.onclick=(event)=>{
+    event.preventDefault()
+    cambiarPass()
+}

@@ -66,6 +66,30 @@ class userController {
         resp.send({status:'ok', message: 'se creo el usuario con exito', payload:result})
     }
 
+    changeRole = async(req,resp)=>{
+        let uid=req.params.uid
+        let searchedUser=''
+        try{
+            searchedUser= await userModel.findOne({_id:uid}).lean() || null
+        }
+        catch{
+            searchedUser= null
+        }
+
+        if(await searchedUser.role=='admin'){
+            resp.status(500).send({status:'error', message: 'el usuario es admin'})
+        }else if(searchedUser.role=='premium'){
+            await userModel.updateOne({_id:uid},{role:'user'})
+            resp.status(200).send({status:'OK', message: 'el usuario ahora tiene rol USER'})
+        }else{
+            await userModel.updateOne({_id:uid},{role:'premium'})
+            resp.status(200).send({status:'OK', message: 'el usuario ahora tiene rol PREMIUM'})
+        }
+
+    }
+
+
+
     getUserById = async(req,resp)=>{
         let uid=req.params.uid
         let searchedUser=''
@@ -117,6 +141,22 @@ class userController {
         }
     }
 
+    recuperar=async (req, resp)=>{
+        let {pass}=req.query
+        let user=req.user
+        let userlogged= await this.UM.recuperar(user.email, pass)
+        delete userlogged.password
+        if(userlogged=="invalidUser"){
+    
+            resp.status(400).send({status:'ERROR', message:"Usuario incorrecto"})
+        }else if(userlogged=="mismoPass"){
+            resp.status(400).send({status:'ERROR', message:"Esta utilizando el mismo Pass, elija otro"})
+        }
+        else{
+            req.session.users = userlogged
+            resp.send({status:'OK', message:"Clave modificada exitosamente ", datos:userlogged})
+        }
+    }
     addCart=async (req,resp)=>{
         const user=req.params.email
         const cid=req.params.cid

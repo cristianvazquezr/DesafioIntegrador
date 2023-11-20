@@ -33,6 +33,9 @@ sessionRouter.get('/session/logout',UC.logout)
 //restore
 sessionRouter.post('/session/restore', UC.restore)
 
+//restore
+sessionRouter.post('/session/recuperar', UC.recuperar)
+
 
 
 export default sessionRouter

@@ -18,7 +18,7 @@ class ticketManager{
         else{
  
             let date=new Date()
-            let fecha =`${date.toLocaleDateString()}  ${date.toLocaleTimeString()}`
+            let fecha =`${date.toLocaleDateString()}`
             //para generar el numero aleatorio debo chequear que no exista en la lista de code de los ticket.
             let code = Math.floor(Math.random() * 100000000000000000)
             let clientList=await ticketModel.find().lean()

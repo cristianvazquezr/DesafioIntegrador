@@ -52,6 +52,26 @@ async function logout(){
 let logoutElement = document.getElementById("logout")
 logoutElement.onclick=logout
 
+//recuperar contrasena
+
+async function cambiarPass(){
+    try{
+        let email=await fetch(`/api/email`, {
+        method:'get',
+        })
+        console.log(email.status + ' ' + email.message)
+        console.log("Correo Enviado")
+    }catch(err){
+        console.log("fallo " + err)
+    }
+}
+
+let restoreElement = document.getElementById("RecuperarPass")
+restoreElement.onclick=(event)=>{
+    event.preventDefault()
+    cambiarPass()
+}
+
 // guardo en el sessionStorage el ID del carrito en el que va trabajar el cliente. sino existe lo crea.
 async function validarCarrito(){
     let cartUser= await JSON.parse(sessionStorage.getItem('carrito'))
@@ -122,7 +142,7 @@ async function addToCart(idProducto){
             "Content-Type": "application/json",
         }
         })
-        console.log("Se agrego el producto")
+        console.log(await addProd)
         await countItemCart()
         await hrefCarrito()
     }catch(err){

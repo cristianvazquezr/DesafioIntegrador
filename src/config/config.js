@@ -21,5 +21,8 @@ export default{
     mongoURL:process.env.MONGO_URL,
     adminUser:process.env.ADMIN_NAME,
     adminPass:process.env.ADMIN_PASS,
-    enviroment:process.env.ENVIROMENT
+    enviroment:process.env.ENVIROMENT,
+    mailingUser:process.env.MAILING_USER,
+    mailingService:process.env.MAILING_SERVICE,
+    mailingPass:process.env.MAILING_PASS,
 }

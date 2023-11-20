@@ -58,7 +58,16 @@ export const passportCall=(strategy)=>{
 
 //middleware de autorizacion
 
-export const authorization =(role)=>{
+export const authorizationAdminPremium =()=>{
+    return async (req, res, next)=>{
+
+        if(req.user.role!="premium" && req.user.role!="admin") return res.status(403).send({error:"no posee permisos administrador para ver esta pagina"})
+        return next()
+    }
+    
+}
+
+export const authorization=(role)=>{
     return async (req, res, next)=>{
         if(req.user.role!=role) return res.status(403).send({error:"no posee permisos administrador para ver esta pagina"})
         return next()
