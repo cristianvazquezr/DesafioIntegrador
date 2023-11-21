@@ -7,6 +7,9 @@
 
 GOOD MARKET es una tienda de productos online, en la que se pueden comprar distintas productos alimenticios. Esta pagina esta disenada con node en la que se usaron varias librerias y aplicaciones como BOOTSTRAP, SWEET ALERT, express,mogo DB, entre otras.  
 
+## DOCUMENTACION
+
+link a la documentacion http://localhost:8080/apidocs/
 
 ## CARACTERISTICAS
 La pagina posee las siguientes caracteristicas:

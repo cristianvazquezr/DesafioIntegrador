@@ -24,11 +24,11 @@ class cartController {
         let cid=req.params.cid
     
         if((cid==undefined)){
-            resp.status(500).send({status:'error', message:"no definio un id o el mismo es incorrecto."})
+            resp.status(400).send({status:'error', message:"no definio un id o el mismo es incorrecto."})
         }else{
             let respuesta=await this.CM.getCartById(cid)
             if(respuesta==false){
-                resp.status(500).send({status:'error', message:"no existe el id"})
+                resp.status(400).send({status:'error', message:"no existe el id"})
                 
             }else{
                 resp.send(await respuesta)
@@ -108,9 +108,9 @@ class cartController {
         if((await agregarProducto=='carritoActualizado')){
             resp.send("se actualizo el carrito correctamente")
         }else if(agregarProducto=="productosInvalidos"){
-            resp.status(500).send({status:'error', message:"ingreso un ID de producto que no existe"})
+            resp.status(400).send({status:'error', message:"ingreso un ID de producto que no existe"})
         } else{
-            resp.status(500).send({status:'error', message:"No existen carritos con ese ID elegido"})
+            resp.status(400).send({status:'error', message:"No existen carritos con ese ID elegido"})
         }
     }
     buyCart=async (req,resp)=>{

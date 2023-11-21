@@ -26,7 +26,8 @@ import cluster from "cluster"
 import { cpus } from 'os'
 import MongoSingleton from './config/mongoSingleton.js'
 import mailRouter from './Routes/mail.router.js'
-
+import swaggerJSDoc from 'swagger-jsdoc'
+import swaggerUIExpress from 'swagger-ui-express'
 
 // corroboro si es proceso primario
 if (cluster.isPrimary){
@@ -55,6 +56,23 @@ if (cluster.isPrimary){
     const puerto=config.port
 
     const app=express()
+
+    const swaggerOptions={
+        definition:{
+            openapi:'3.0.1',
+            info:{
+                title:'Documentacion proyecto final',
+                description:'Documentacion de las APIs relacionadas al ECOMMERCE realizado como projecto Final de curso de BACKEND de CODERHOUSE'
+            }
+        },
+        apis:[`./docs/**/*.yaml`]
+        
+    }
+
+    const specs=swaggerJSDoc(swaggerOptions)
+
+    //declaro el endpoint de swagger
+    app.use('/apidocs',swaggerUIExpress.serve,swaggerUIExpress.setup(specs))
 
     const httpServer= app.listen(puerto,async ()=>{
         console.log(`servidor conectado al puerto ${puerto}`)
@@ -94,6 +112,8 @@ if (cluster.isPrimary){
     app.use(passport.initialize());
     app.use(passport.session());
 
+    //declaro el endpoint de swagger
+    app.use('/apidocs',swaggerUIExpress.serve,swaggerUIExpress.setup(specs))
     app.use("/", viewsRouter)
     app.use("/api", productRouter)
     app.use("/api", cartRouter)

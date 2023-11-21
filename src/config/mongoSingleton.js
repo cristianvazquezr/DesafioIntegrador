@@ -13,8 +13,6 @@ export default class MongoSingleton {
 
     };
 
- 
-
     static getInstance(){
 
         if (this.#instance) {
