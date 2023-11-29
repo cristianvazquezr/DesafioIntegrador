@@ -31,13 +31,18 @@ class ProductController{
     addProduct= async (req,resp)=>{
     
         let {title, description, category, price, thumbnail, code, stock, owner}=req.body
-        let roleUser=req.user.role
-        let email=req.user.email
-        if(roleUser=="premium"){
-            owner=email
-        }else{
-            owner='admin'
+
+        try{let roleUser=req.user.role
+            let email=req.user.email
+            if(roleUser=="premium"){
+                owner=email
+            }else{
+                owner='admin'
+            }
+        }catch(err){
+            console.log(err)
         }
+        
     
         let productos=await this.PM.addProduct(title, description, category, price, thumbnail, code, stock, owner)
        
@@ -47,7 +52,7 @@ class ProductController{
             
             resp.status(400).send({status:"error", message:"ya existe producto con ese code"})
         } else{
-            resp.status(200).send({status:"OK", message:"se agrego correctamente"})
+            resp.status(200).send({status:"OK", message:"se agrego correctamente", payLoad:productos})
         }
     }
 
@@ -70,6 +75,7 @@ class ProductController{
     }
 
     deleteProduct=async (req,resp)=>{
+        
         const id =req.params.pid
         let user = req.user.email
         let productos=await this.PM.deleteProduct(id,user)

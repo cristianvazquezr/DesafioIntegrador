@@ -13,8 +13,20 @@ console.log(program.opts())
 
 let entorno=program.opts().mode
 
-dotenv.config({
-    path: entorno == "desarrollo" ? "./config/.env.devop" : "./config/.env.prod"});
+let path=""
+if(entorno=="desarrollo"){
+    path="./config/.env.devop"
+}else if(entorno=="test"){
+    path="./config/.env.test"
+}else{
+    path="./config/.env.prod"
+}
+
+dotenv.config(
+    {
+        path:path
+    }
+)
 
 export default{
     port:process.env.PORT,
