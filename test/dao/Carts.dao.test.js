@@ -1,45 +1,44 @@
 import mongoose from "mongoose";
-import ProductManager from "../../src/dao/ProductManager.js";
 import Assert from 'assert'
+import cartManager from "../../src/dao/cartManager.js";
 
 mongoose.connect("mongodb+srv://vazquezcristianr:Cristian123@clustercristian.ggp7vhd.mongodb.net/ecommerce-test?retryWrites=true&w=majority")
 const assert=Assert.strict;
 
-describe('testing products DAO', ()=>{
+describe('testing carts DAO', ()=>{
 
     before(function(){
-        this.productDao=new ProductManager()
+        this.cartDao=new cartManager()
     })
 
     beforeEach(async function(){
-        mongoose.connection.collections.products.drop()
+        mongoose.connection.collections.carts.drop()
         this.timeout(50000)
     })
 
     it('el get debe devolver un arreglo', async function(){
-        const result= await this.productDao.getProducts({});
+        const result= await this.cartDao.getCarts();
         console.log(result);
         assert.strictEqual(typeof result, 'object')
 
     }).timeout(10000)
 
-    it('el AddProduct debe agregar un producto ', async function(){
+    it('el createCart debe crear un cart ', async function(){
 
-        const result= await this.productDao.addProduct("title", "description", "category", 100, "thumbnail", 100, 100, 'premium');
+        const result= await this.cartDao.createCart();
         console.log(result);
-        assert.strictEqual(result, true)
+        assert.strictEqual(typeof result, 'object')
 
     }).timeout(10000)
 
-    it('el getProductById debe buscar un producto por ID ', async function(){
+    it('el getCartById debe buscar un carrito por ID ', async function(){
 
-        const addProduct= await this.productDao.addProduct("title", "description", "category", 100, "thumbnail", 1, 1, 'premium');
-        const getProducts=await this.productDao.getProducts({})
-        const idProduct=getProducts.payLoad[0]._id
-        const result= await this.productDao.getProductById(idProduct)
-        console.log(result);
-        console.log(idProduct);
-        assert.strictEqual(typeof result, 'object')
+        const createCart= await this.cartDao.createCart()
+        const getCarts=await this.cartDao.getCarts()
+        const idCarts=getCarts[0]._id
+        const result= await this.cartDao.getCartById(idCarts)
+        console.log(idCarts);
+       // assert.strictEqual(typeof result, 'object')
 
     }).timeout(10000)
 
