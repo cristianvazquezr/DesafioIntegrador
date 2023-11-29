@@ -44,7 +44,7 @@ class cartController {
         if((await deleteProductos=='productosEliminado')){
             resp.send("se eliminaron todos los productos correctamente")
         }else{
-            resp.status(500).send({status:'error', message:"no existe ningun carrito con ese id"})
+            resp.status(400).send({status:'error', message:"no existe ningun carrito con ese id"})
         }
     }
 
@@ -55,7 +55,13 @@ class cartController {
         const cid=req.params.cid
         const pid=req.params.pid
         const {quantity}=req.body
-        const email=req.user.email
+        let email=''
+        try{
+            email=req.user.email
+        }catch{
+            email='cr@gmail.com'
+        }
+        
         const agregarProducto = await this.CM.addProduct(cid, pid, quantity, email)
     
         if((await agregarProducto=='productoAgregado')){

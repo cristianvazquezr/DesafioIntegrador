@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import chai from "chai";
 import supertest from "supertest";
 import ProductManager from "../src/dao/ProductManager.js";
+import cartManager from "../src/dao/cartManager.js";
 
 mongoose.connect("mongodb+srv://vazquezcristianr:Cristian123@clustercristian.ggp7vhd.mongodb.net/ecommerce-test?retryWrites=true&w=majority")
 
@@ -19,7 +20,7 @@ describe('corriendo test wepApp', ()=>{
         code:4,
         stock:180,
         category:'category',
-        owner:'premium'}
+        owner:'cr@gmail.com'}
 
         it('crear productos: api post debe crear un producto', async()=>{
             
@@ -36,8 +37,6 @@ describe('corriendo test wepApp', ()=>{
             expect(_body.message).is.eqls("ya existe producto con ese code")
         }).timeout(10000)
 
-
-
         it('Get producto: api get debe obtener todos los productos', async()=>{
             const {statusCode,ok,_body}= await requester.get(`/api/products/`)
             expect(statusCode).is.eqls(200)
@@ -45,4 +44,37 @@ describe('corriendo test wepApp', ()=>{
         }).timeout(10000)
        
     })
+    describe('testing carts API',async()=>{
+
+        const cartDao=new cartManager()
+        const productDao= new ProductManager()
+ 
+        it('crear cart: api post debe crear un cart', async()=>{
+            const {statusCode,ok,_body}= await requester.post('/api/carts/').send()
+            expect(statusCode).is.eqls(200)
+        }).timeout(10000)
+ 
+        it('agregar producto al carrito: api post debe tirar error si el producto es de su autoria', async()=>{
+
+            const getCarts=await cartDao.getCarts()
+            const idCarts=getCarts[0]._id
+
+            const addProduct= await productDao.addProduct("title", "description", "category", 100, "thumbnail", 1, 1423, 'premium');
+            const getProducts=await productDao.getProducts({})
+            const idProduct=getProducts.payLoad[0]._id
+
+
+            
+            const {statusCode,ok,_body}= await requester.post(`/api/carts/${idCarts}/product/${idProduct}`).send({quantity:10})
+            expect(statusCode).is.eqls(500)
+            expect(_body.status).is.eqls('error')
+            expect(_body.message).is.eqls("no puede agregar al carrito su propio producto")
+        }).timeout(10000)
+ 
+         it('Get carts: api get debe obtener todos los carts', async()=>{
+             const {statusCode,ok,_body}= await requester.get(`/api/carts/`)
+             expect(statusCode).is.eqls(200)
+         }).timeout(10000)
+        
+     })
 })
