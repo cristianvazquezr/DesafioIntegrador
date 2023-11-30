@@ -118,6 +118,8 @@ describe('corriendo test wepApp', ()=>{
             role:'admin'
         }
 
+        let cookie=''
+
         it('registrar usuario: api post debe registrar un usuario', async()=>{
 
 
@@ -135,10 +137,16 @@ describe('corriendo test wepApp', ()=>{
                 password:newUser.password, 
             }
 
-            const {statusCode,ok,_body}= await requester.post('/api/session/login').send(User)
+            const {statusCode,ok,_body,headers}= await requester.post('/api/session/login').send(User)
             console.log(_body)
             console.log(statusCode)
             expect(statusCode).is.eqls(200)
+            let cookieResponse=headers['set-cookie'][0].split('=')
+            cookie={
+                name:cookieResponse[0],
+                value:cookieResponse[1]
+            }
+            expect(cookie.name).to.be.ok
         }).timeout(10000)
     })
 }).timeout(70000)
