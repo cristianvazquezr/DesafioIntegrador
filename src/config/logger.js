@@ -38,8 +38,8 @@ export const addlogger=(req, res, next) =>{
     }else{
         req.logger=prodLogger
     }
-    req.logger.debug(`${req.method} en ${req.url} - ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`)
+    req.logger.debug(`${req.method} en ${req.url}  - ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`)
     req.logger.http(`${req.method} en ${req.url} - ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`)
-    req.logger.error(`${req.method} en ${req.url} - ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`)
+    req.logger.error(`${req.method} en ${req.url}  - ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`)
     next()
 }

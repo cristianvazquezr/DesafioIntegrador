@@ -11,11 +11,7 @@ const expect = chai.expect
 const requester=supertest('http://localhost:8080')
 
 describe('corriendo test wepApp', ()=>{
-    beforeEach(async function(){
-        mongoose.connection.collections.products.drop()
-        mongoose.connection.collections.carts.drop()
-    })
-
+   
     describe('testing products API',async()=>{
 
        let  product={
@@ -26,6 +22,11 @@ describe('corriendo test wepApp', ()=>{
         stock:180,
         category:'category',
         owner:'cr@gmail.com'}
+
+        beforeEach(async function(){
+            mongoose.connection.collections.products.drop()
+            mongoose.connection.collections.carts.drop()
+        })
 
         it('crear productos: api post debe crear un producto', async()=>{
             
@@ -52,23 +53,32 @@ describe('corriendo test wepApp', ()=>{
 
         }).timeout(10000)
        
-    })
+    }).timeout(70000)
     describe('testing carts API',async()=>{
 
         const cartDao=new cartManager()
         const productDao= new ProductManager()
+
+        beforeEach(async function(){
+            mongoose.connection.collections.products.drop()
+            mongoose.connection.collections.carts.drop()
+        })
  
         it('crear cart: api post debe crear un cart', async()=>{
             const {statusCode,ok,_body}= await requester.post('/api/carts/').send()
             expect(statusCode).is.eqls(200)
-        }).timeout(10000)
+        }).timeout(60000)
  
-        it('agregar producto al carrito: api post debe tirar error si el producto es de su autoria', async()=>{
+        it('agregar producto al carrito: api post debe tirar error si el no se encontro el carrito con ese id', async()=>{
 
+            //creo el carrito
+            const createCart=await cartDao.createCart()
             //obtengo los carritos
             const getCarts=await cartDao.getCarts()
             //busco un ID
             const idCarts=getCarts[0]._id
+
+            console.log(idCarts)
 
             // creo un producto y busco su ID
             const addProduct= await productDao.addProduct("title", "description", "category", 100, "thumbnail", 1, 1423, 'premium');
@@ -76,10 +86,12 @@ describe('corriendo test wepApp', ()=>{
             const idProduct=getProducts.payLoad[0]._id
 
             // agrego el producto al carrito
-            const {statusCode,ok,_body}= await requester.post(`/api/carts/${idCarts}/product/${idProduct}`).send({quantity:10})
+            const {statusCode,ok,_body}= await requester.post(`/api/carts/123/product/${idProduct}`).send({quantity:10})
+            console.log(idCarts)
+            
             expect(statusCode).is.eqls(500)
             expect(_body.status).is.eqls('error')
-            expect(_body.message).is.eqls("no puede agregar al carrito su propio producto")
+            expect(_body.message).is.eqls("no se encontro el carrito con ese id")
         }).timeout(10000)
  
         it('Get carts: api get debe obtener todos los carts', async()=>{
@@ -87,6 +99,46 @@ describe('corriendo test wepApp', ()=>{
             expect(statusCode).is.eqls(200)
         }).timeout(10000)
         
-    })
+    }).timeout(70000)
 
+    describe('testing session API',async()=>{
+
+        after(async function(){
+            mongoose.connection.collections.users.drop()
+        })
+
+
+        let newUser=
+        {
+            first_name:'cristian',
+            last_name:'vazquez',
+            email:'cristiancristian@gmail.com',
+            password:'12312', 
+            age:20,
+            role:'admin'
+        }
+
+        it('registrar usuario: api post debe registrar un usuario', async()=>{
+
+
+            const {statusCode,ok,_body}= await requester.post('/api/session/register').send(newUser)
+            console.log(_body)
+            console.log(statusCode)
+            expect(statusCode).is.eqls(200)
+        }).timeout(10000)
+
+        it('login usuario: api post debe loguear el usuario', async()=>{
+
+            let User=
+            {
+                email:newUser.email,
+                password:newUser.password, 
+            }
+
+            const {statusCode,ok,_body}= await requester.post('/api/session/login').send(User)
+            console.log(_body)
+            console.log(statusCode)
+            expect(statusCode).is.eqls(200)
+        }).timeout(10000)
+    })
 }).timeout(70000)

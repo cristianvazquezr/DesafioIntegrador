@@ -38,7 +38,7 @@ describe('testing carts DAO', ()=>{
         const idCarts=getCarts[0]._id
         const result= await this.cartDao.getCartById(idCarts)
         console.log(idCarts);
-       // assert.strictEqual(typeof result, 'object')
+       assert.strictEqual(typeof result, 'object')
 
     }).timeout(10000)
 
