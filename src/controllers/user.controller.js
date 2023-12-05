@@ -1,5 +1,5 @@
 import userMananger from "../dao/userMananger.js";
-import {generateToken} from '../utils.js'
+import {generateToken, uploader} from '../utils.js'
 import CustomError from "../services/errors/CustomErrors.js";
 import { generateUserErrorInfo, searchedUserErrorInfo } from "../services/messages/messages.js";
 import EErrors from "../services/errors/enums.js";
@@ -13,8 +13,8 @@ class userController {
     login=async(req, res)=>{
         if(!req.user) return res.status(400).send({status:"error",message:"credenciales invalidas"})
         delete req.user.password
+        const lastConnection=await this.UM.lastConnection(req.user._id)
         const access_token=generateToken(req.user)
-        console.log(access_token)
         res.cookie("cookieEcommerce", access_token, {maxAge:3600000, httpOnly:true}).send({status:"success", access_token,datos:req.user})
     }
     current=async (req,res)=>{
@@ -22,11 +22,13 @@ class userController {
         req.user=User
         delete req.user.password
         delete req.user.__v
-        console.log(req.user)
         res.send({status:'success', datos:req.user})
     }
 
     loginGitHub=async(req, res)=>{
+        const lastConnection= await this.UM.lastConnection(req.user._id)
+
+        console.log('soy el lastConnnection ' + lastConnection)
         delete req.user.password
         delete req.user.__v
         req.session.user={
@@ -82,12 +84,31 @@ class userController {
             await userModel.updateOne({_id:uid},{role:'user'})
             resp.status(200).send({status:'OK', message: 'el usuario ahora tiene rol USER'})
         }else{
-            await userModel.updateOne({_id:uid},{role:'premium'})
+            if(Object.values(searchedUser.documentStatus).includes(false)){
+                resp.status(500).send({status:'error', message: 'el usuario no posee toda la documentacion cargada'})
+            }else{
+                await userModel.updateOne({_id:uid},{role:'premium'})
             resp.status(200).send({status:'OK', message: 'el usuario ahora tiene rol PREMIUM'})
+            }
         }
 
     }
 
+    uploader=async (req,resp)=>{
+        let documentSubType=req.body.documentType
+        let uid=req.user._id
+        if(!req.file){
+            return resp.status(400).send({status:"error", message:"no se adjunto archivo"})
+        }else{
+            console.log(req.file)
+            let documentsPath= req.file.path
+            let documentType= req.file.fieldname
+            let documentName=req.file.filename
+            await this.UM.uploaderManager(uid,documentName,documentsPath,documentType,documentSubType)
+            return resp.status(201).send({status:"ok", message:"se adjunto el archivo correctamente"})
+        }
+        
+    }
 
 
     getUserById = async(req,resp)=>{
@@ -118,6 +139,7 @@ class userController {
     }
 
     logout=async(req,res)=>{
+        const lastConnection= await this.UM.lastConnection(req.user._id)
         req.session.destroy()
         // let delete_cookie = async function(name) {
         //     document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';

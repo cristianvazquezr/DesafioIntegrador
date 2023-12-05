@@ -252,3 +252,18 @@
     flex-direction: column;
     align-items: center;
 }
+
+.itemsDocuments{
+    display: none;
+}
+
+.true{
+    display: flex;
+}
+
+
+.dropdown-menu{
+    height: 250px;
+    width: 250px;
+   
+}

@@ -10,7 +10,7 @@ const errorHandler=(error, req, res, next)=>{
             res.status(400).send({status:'error', error: error.message})
             break
         default:
-            res.status(500).send({status:'error', error: 'ahundled error'})
+            res.status(500).send({status:'error', error: error.message, message: "ahundled error"})
     }
     next()
 }

@@ -1,5 +1,6 @@
 import ProductManager from "../dao/ProductManager.js"
 import cartManager from "../dao/cartManager.js"
+import { userModel } from "../dao/models/user.model.js"
 import ticketManager from "../dao/ticketManager.js"
 
 class viewsController{
@@ -22,6 +23,7 @@ class viewsController{
             product:productos,
             user:userLogged,
             style:"../../css/style.css",
+            idUser:req.user._id,
         })
     }
     realTimeProducts = async (req,resp)=>{
@@ -31,7 +33,8 @@ class viewsController{
         resp.render("realTimeProducts",{
             user:userLogged,
             email:emailLogged,
-            style:"style.css"
+            style:"style.css",
+            idUser:req.user._id,
         })
     }
 
@@ -41,7 +44,8 @@ class viewsController{
     
         resp.render("chat",{
             user:userLogged,
-            style:"../../css/style.css"
+            style:"../../css/style.css",
+            idUser:req.user._id,
         })
     }
     cart = async (req,resp)=>{
@@ -53,6 +57,7 @@ class viewsController{
             user:userLogged,
             productos:respuesta[0].products,
             style:"../../css/style.css",
+            idUser:req.user._id,
         })
     }
     login=async (req,resp)=>{
@@ -62,7 +67,7 @@ class viewsController{
     }
     register=async (req,resp)=>{
         resp.render("register",{
-            style:"../../css/style.css"
+            style:"../../css/style.css",
         })
     }
     profile=async (req,resp)=>{
@@ -88,8 +93,8 @@ class viewsController{
         resp.render("recuperar",{
             style:"../../css/style.css",
             user:userLogged,
-            email:emailLogged
-
+            email:emailLogged,
+            idUser:req.user._id,
         })
     }
 
@@ -100,19 +105,60 @@ class viewsController{
         resp.render("emailRecuperarPass",{
             style:"../../css/style.css",
             user:userLogged,
-            email:emailLogged
-
+            email:emailLogged,
+            idUser:req.user._id,
         })
+    }
+
+    uploader=async(req,resp)=>{
+
+        //estado documentos
+
+        let searchedUser=await userModel.findOne({_id:req.user._id}).lean()
+        
+        let identification='none'
+        let location='none'
+        let account='none'
+        try{
+            let documentStatus=searchedUser.documentStatus
+            if(documentStatus.location==true){
+                location="flex"
+            }
+    
+            if(documentStatus.account==true){
+                account="flex"
+            }
+    
+            if(documentStatus.identification==true){
+                identification="flex"
+            }
+        }catch(err){
+            console.log("aun no existen documentos para el usuario")
+        }
+        
+
+        resp.render("documents",{
+            style:"../../css/style.css",
+            user:req.user.first_name,
+            name:req.user.first_name,
+            lastname:req.user.last_name,
+            email:req.user.email,
+            age:req.user.age,
+            role:req.user.role,
+            idUser:req.user._id,
+            identification:identification,
+            account:account,
+            location:location
+        })
+
     }
 
     purchase = async (req,resp)=>{
 
         let nameLogged=req.user.first_name
         let lastNameLogged=req.user.last_name
-        console.log(req.user)
         let tid=req.params.tid
         let respuesta=await this.TM.getTicketById(tid)
-        console.log(respuesta)
         resp.render("ticket",{
             fecha:respuesta.purchase_date,
             nameClient:nameLogged,
@@ -121,6 +167,7 @@ class viewsController{
             productos:respuesta.purchesedProducts,
             sinStock:respuesta.notPurchesedProducts,
             style:"../../css/style.css",
+            idUser:req.user._id,
         })
     }
 

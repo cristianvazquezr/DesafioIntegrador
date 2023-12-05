@@ -3,6 +3,7 @@ import {dirname} from "path"
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 import passport from "passport"
+import multer from "multer"
 
 
 
@@ -75,12 +76,36 @@ export const authorization=(role)=>{
     
 }
 
-
 export const createHash = password => bcrypt.hashSync(password,bcrypt.genSaltSync(10))
 
 export const isValidPassword = (user, password)=> bcrypt.compareSync(password, user.password)
 
 const __filename=fileURLToPath(import.meta.url)
 const __dirname=dirname(__filename)
+
+// configuracion de multer para subir archivos
+
+const storage=multer.diskStorage({
+    destination:function(req,file,cb){
+        if(file.fieldname=='document'){
+            cb(null,`${__dirname}/public/images/documents`)
+        }else if(file.fieldname=='profile'){
+            cb(null,`${__dirname}/public/images/profile`)
+        }else{
+            cb(null,`${__dirname}/public/images/products`)
+        }
+    },
+    filename:function(req,file,cb){
+        console.log(file)
+        cb(null,`${Date.now()}-${file.originalname}` )
+    }
+
+})
+
+export const uploader=multer({storage,onError:function(err,next){
+    console.log(err);
+    next();
+}})
+
 
 export default __dirname

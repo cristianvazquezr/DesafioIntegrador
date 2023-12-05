@@ -1,6 +1,8 @@
 import { Router } from "express"
 import viewsController from "../controllers/views.controller.js"
 import { authorization, authorizationAdminPremium, } from "../utils.js"
+
+
 //creo el middleware para autenticar administrador
 function authAdmin(req, res, next) {
     if (req?.admin) {
@@ -66,5 +68,7 @@ viewsRouter.get('/recuperar',authRestaurar,VC.recuperar)
 viewsRouter.get('/emailRecuperarPass',VC.emailRecuperarPass)
 
 viewsRouter.get('/purchase/:tid',VC.purchase)
+
+viewsRouter.get('/uploader/:uid',auth,VC.uploader)
 
 export default viewsRouter  

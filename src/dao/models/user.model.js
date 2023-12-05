@@ -27,8 +27,32 @@ const userSchema=new mongoose.Schema({
             }
         ]
        
-    }
+    },
+    documents:{
+        type:[
+            {
+                name:String,
+                reference:String,
+                documentType:String,
+            }
+        ]
 
+    },
+    documentStatus:{
+        identification:{
+            type:Boolean,
+            default:false
+        },
+        location:{
+            type:Boolean,
+            default:false
+        },
+        account:{
+            type:Boolean,
+            default:false
+        }
+    },
+    last_connection:String,
 })
 
 userSchema.pre('find',function(){

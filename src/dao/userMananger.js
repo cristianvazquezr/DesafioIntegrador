@@ -22,6 +22,67 @@ class userMananger{
         }
     }
 
+    async uploaderManager(uid,fileName,documentsPath,documentType,documentSubType){
+
+        const user=await userModel.findOne({_id:uid})
+        let documentList=[]
+
+        if (user){
+
+            let documentStatusReceived=user.documentStatus
+            documentList=user.documents
+            let documentReceived={
+                name:fileName,
+                reference:documentsPath,
+                documentType:documentType,
+            }
+
+            //modifico el status de los documentos
+            if(documentSubType=='identificacion'){
+                documentStatusReceived.identification=true;
+            }else if(documentSubType=='domicilio'){
+                documentStatusReceived.location=true;
+            }else if(documentSubType=='cuenta'){
+                documentStatusReceived.account=true;
+            }
+            await userModel.updateOne({_id:uid},{documentStatus:documentStatusReceived},{multi:true}, 
+                function(err, numberAffected){  
+            })
+            
+            //actualizo los archivos
+
+            documentList.push(documentReceived)
+
+            await userModel.updateOne({_id:uid},{documents:documentList},{multi:true}, 
+                function(err, numberAffected){  
+            })
+
+
+        }else{
+            return false
+        }
+    }
+
+    async lastConnection(id){
+        // llamo la funcion para obtener los usuarios y buscar por id
+        console.log('soy la funcion interna de lastConnnection ' + id)
+        const usuarioBuscado=await userModel.find({_id:id})
+        if(await usuarioBuscado!=undefined){
+
+            let date=new Date()
+            let lastConnection =`${date.toLocaleDateString()} - ${date.toLocaleTimeString()}`
+            const usuarioModificado=await userModel.updateOne({_id:id},{last_connection:lastConnection},{multi:true}, 
+                function(err, numberAffected){  
+                })
+            return (await usuarioModificado) 
+        }
+        else{
+        console.log("Not found")
+        return (false)
+        }
+
+    }
+
     async getUsers(params){
         let {limit, page, query, sort}=params
         limit = limit ? limit : 10;
