@@ -20,6 +20,7 @@ class viewsController{
         let userLogged=req.user.first_name   
         let productos=await this.PM.getProducts(req.query)
         resp.render("products",{
+            role:req.user.role,
             product:productos,
             user:userLogged,
             style:"../../css/style.css",
@@ -31,6 +32,20 @@ class viewsController{
         let userLogged=req.user.first_name
         let emailLogged=req.user.email
         resp.render("realTimeProducts",{
+            role:req.user.role,
+            user:userLogged,
+            email:emailLogged,
+            style:"style.css",
+            idUser:req.user._id,
+        })
+    }
+
+    editUser = async (req,resp)=>{
+
+        let userLogged=req.user.first_name
+        let emailLogged=req.user.email
+        resp.render("editUsers",{
+            role:req.user.role,
             user:userLogged,
             email:emailLogged,
             style:"style.css",
@@ -43,6 +58,7 @@ class viewsController{
         let userLogged=req.user.first_name
     
         resp.render("chat",{
+            role:req.user.role,
             user:userLogged,
             style:"../../css/style.css",
             idUser:req.user._id,
@@ -54,6 +70,7 @@ class viewsController{
         let cid=req.params.cid
         let respuesta=await this.CM.getCartById(cid)
         resp.render("cartId",{
+            role:req.user.role,
             user:userLogged,
             productos:respuesta[0].products,
             style:"../../css/style.css",
@@ -92,6 +109,7 @@ class viewsController{
         let emailLogged=req.user.email
         resp.render("recuperar",{
             style:"../../css/style.css",
+            role:req.user.role,
             user:userLogged,
             email:emailLogged,
             idUser:req.user._id,
@@ -104,6 +122,7 @@ class viewsController{
         let emailLogged=req.user.email
         resp.render("emailRecuperarPass",{
             style:"../../css/style.css",
+            role:req.user.role,
             user:userLogged,
             email:emailLogged,
             idUser:req.user._id,
@@ -139,6 +158,7 @@ class viewsController{
 
         resp.render("documents",{
             style:"../../css/style.css",
+            role:req.user.role,
             user:req.user.first_name,
             name:req.user.first_name,
             lastname:req.user.last_name,
@@ -160,6 +180,8 @@ class viewsController{
         let tid=req.params.tid
         let respuesta=await this.TM.getTicketById(tid)
         resp.render("ticket",{
+            user:nameLogged,
+            role:req.user.role,
             fecha:respuesta.purchase_date,
             nameClient:nameLogged,
             lastNameCLient:lastNameLogged,

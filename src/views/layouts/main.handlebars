@@ -8,7 +8,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Gruppo&family=Parisienne&family=Passion+One:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <link rel="stylesheet" href="css/{{style}}">
+    
   </head>
   <body>
     <div id="contenedorPrincipal" class="container p-0 contenedorPrincipal">
@@ -21,11 +23,12 @@
             <span class="navbar-toggler-icon"></span>
           </button>
           <div class="collapse navbar-collapse itemsNavBar" id="navbarNavAltMarkup">
-            <div class="navbar-nav">
+            <div class="navbar-nav" id="{{role}}">
               <a class="nav-link" aria-current="page" href="/">Home</a>
               <a class="nav-link" href="/realTimeProducts">RealTimeProducts</a>
               <a class="nav-link" href="/products">Products</a>
-              <a class="nav-link" href="/chat">chat</a>
+              <a class="nav-link" href="/chat">Chat</a>
+              <a class="nav-link" id="onlyAdmin"  href="/editUsers">Administrar usuarios</a>
             </div>
             <div class="cart-user">
 
@@ -58,3 +61,7 @@
   </body>
  
 </html>
+
+<script src="/js/isAdmin.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

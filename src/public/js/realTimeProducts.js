@@ -33,7 +33,14 @@ async function handleClick(){
             "Content-Type": "application/json",
         }
     })
-    console.log(await addProduct.message);
+
+    let response= await addProduct.json()
+    Swal.fire({
+        title: "Producto creado!",
+        text: `${response.message}`,
+        icon: "success"
+    });
+
     socket.emit("agregarProducto");
     
     formularioAdd.reset();
@@ -63,7 +70,27 @@ async function  DeleteProduct(idElementoEliminar){
             "Content-Type": "application/json",
         }
     })
-    console.log(await deleteProduct.message);
+    let response=await deleteProduct.json()
+
+    if(response.status=='error'){
+        //cartel
+        Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: `${response.message}`,
+        });
+
+    }else{
+        Toastify({
+            text: "Producto eliminado",
+            className: "info",
+            style: {
+              background: "linear-gradient(to right, #00b09b, #96c93d)",
+            }
+        }).showToast();
+    }
+
+
     socket.emit("eliminarProducto");
 }
 
@@ -78,7 +105,7 @@ socket.on("productos",data=>{
         <td>${element.description}</td>
         <td>${element.category}</td>
         <td>${element.price}</td>
-        <td>${element.thumbnail}</td>
+        <td><img class='imgTable' src ='${element.thumbnail}'></td>
         <td>${element.code}</td>
         <td>${element.stock}</td>
         <td>${element.status}</td>
@@ -120,8 +147,24 @@ async function cambiarPass(){
         let email=await fetch(`/api/email`, {
         method:'get',
         })
-        console.log(email.status + ' ' + email.message)
+        mailObj=await email.json
+        console.log(mailObj.status + ' ' + mailObj.message)
         console.log("Correo Enviado")
+        //alerta
+        Toastify({
+            text: "Correo Enviado",
+            className: "info",
+            style: {
+              background: "linear-gradient(to right, #00b09b, #96c93d)",
+            }
+        }).showToast();
+        //cartel
+        Swal.fire({
+            title: "Correo enviado!",
+            text: "revise su bandeja de correo!",
+            icon: "success"
+          });
+
     }catch(err){
         console.log("fallo " + err)
     }
@@ -132,3 +175,34 @@ restoreElement.onclick=(event)=>{
     event.preventDefault()
     cambiarPass()
 }
+
+//cosulto al session storage si hay carrito, y con un get veo cuantos productos tiene 
+
+let countItem=0
+let cantidadCarrito=document.getElementById("numerito")
+
+async function countItemCart(){
+
+    let cartUser= await JSON.parse(sessionStorage.getItem('carrito'))
+    let idCart=''
+    if(cartUser){
+        idCart=await cartUser
+       let getCart= await fetch(`/api/carts/${idCart}`, {
+            method:'get',
+            headers: {
+                "Content-Type": "application/json",
+            }
+        })
+        let objCart=await getCart.json()
+        let productList=await objCart[0].products
+        countItem=productList.length
+    }
+    else{
+        countItem=0
+    }
+    cantidadCarrito.innerHTML=countItem
+
+    console.log(countItem)
+}
+
+countItemCart()

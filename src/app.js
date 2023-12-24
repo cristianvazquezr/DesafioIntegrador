@@ -28,10 +28,10 @@ import MongoSingleton from './config/mongoSingleton.js'
 import mailRouter from './Routes/mail.router.js'
 import swaggerJSDoc from 'swagger-jsdoc'
 import swaggerUIExpress from 'swagger-ui-express'
+import userMananger from './dao/userMananger.js'
 
 // corroboro si es proceso primario
 if (cluster.isPrimary){
-    console.log('es el proceso primario')
     const numeroDeProcesadores=cpus().length
     console.log('Numero de procesadores: ' + numeroDeProcesadores)
     for (let i=0; i<1; i++){
@@ -50,8 +50,6 @@ if (cluster.isPrimary){
     console.log('soy un worker con el ID de proceso ' + process.pid )
 
     //Creo el servidor
-
-    console.log(config);
 
     const puerto=config.port
 
@@ -136,9 +134,12 @@ if (cluster.isPrimary){
         let productos= await PM.getProducts({limit:'100000', page:'', query:'', sort:''})
         let MM = new messageMananger()
         let mensajes = await MM.getMessage()
+        let UM = new userMananger()
+        let usuarios=await UM.getUsers({limit:"100000", page:'', query:'', sort:''})
         console.log("nueva conexion realizada")
         socketServer.emit("productos",productos)
         socketServer.emit("mensajes",mensajes)
+        socketServer.emit("usuarios",usuarios); 
 
         socket.on("agregarProducto", async()=>{
             let PM = new ProductManager()
@@ -147,6 +148,20 @@ if (cluster.isPrimary){
             socketServer.emit("productos",productos);    
         });
         
+        socket.on("cambiarRol",async()=>{           
+            let UM = new userMananger()
+            let usuarios=await UM.getUsers({limit:"100000", page:'', query:'', sort:''})
+            socketServer.emit("usuarios",usuarios); 
+        })
+
+        socket.on("eliminarUsuario",async()=>{           
+            let UM = new userMananger()
+            let usuarios=await UM.getUsers({limit:"100000", page:'', query:'', sort:''})
+            socketServer.emit("usuarios",usuarios); 
+        })
+
+
+
         socket.on("eliminarProducto",async()=>{           
             let PmNEW = new ProductManager()
             let productos=await PmNEW.getProducts({limit:"100000", page:'', query:'', sort:''})

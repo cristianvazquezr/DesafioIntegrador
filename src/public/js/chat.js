@@ -67,8 +67,24 @@ async function cambiarPass(){
         let email=await fetch(`/api/email`, {
         method:'get',
         })
-        console.log(email.status + ' ' + email.message)
+        mailObj=await email.json
+        console.log(mailObj.status + ' ' + mailObj.message)
         console.log("Correo Enviado")
+        //alerta
+        Toastify({
+            text: "Correo Enviado",
+            className: "info",
+            style: {
+              background: "linear-gradient(to right, #00b09b, #96c93d)",
+            }
+        }).showToast();
+        //cartel
+        Swal.fire({
+            title: "Correo enviado!",
+            text: "revise su bandeja de correo!",
+            icon: "success"
+          });
+
     }catch(err){
         console.log("fallo " + err)
     }
@@ -79,3 +95,33 @@ restoreElement.onclick=(event)=>{
     event.preventDefault()
     cambiarPass()
 }
+
+//cosulto al session storage si hay carrito, y con un get veo cuantos productos tiene 
+
+let countItem=0
+let cantidadCarrito=document.getElementById("numerito")
+
+async function countItemCart(){
+
+    let cartUser= await JSON.parse(sessionStorage.getItem('carrito'))
+    let idCart=''
+    if(cartUser){
+        idCart=await cartUser
+       let getCart= await fetch(`/api/carts/${idCart}`, {
+            method:'get',
+            headers: {
+                "Content-Type": "application/json",
+            }
+        })
+        let objCart=await getCart.json()
+        let productList=await objCart[0].products
+        countItem=productList.length
+    }
+    else{
+        countItem=0
+    }
+    cantidadCarrito.innerHTML=countItem
+
+}
+
+countItemCart()

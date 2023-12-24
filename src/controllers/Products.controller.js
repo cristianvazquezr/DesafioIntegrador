@@ -1,8 +1,10 @@
 import ProductManager from "../dao/ProductManager.js";
+import userMananger from "../dao/userMananger.js";
 
 class ProductController{
     constructor(){
         this.PM= new ProductManager();
+        this.UM= new userMananger()
     }
     getProducts = async (req,resp)=>{
         let productos=await this.PM.getProducts(req.query)
@@ -78,14 +80,28 @@ class ProductController{
         
         const id =req.params.pid
         let user = req.user.email
-        let productos=await this.PM.deleteProduct(id,user)
-       
-        if(productos){
-            resp.status(200).send({status:"OK", message:"se elimino el producto correctamente"})
-    
+        let productoDelete=''
+        let producto=await this.PM.getProductById(id)
+        if(producto[0].owner.includes('@')){
+            productoDelete=await this.PM.deleteProduct(id,user)
+            if(productoDelete){
+                //envia mail
+                let userTo=producto[0].owner
+                await this.PM.sendEmail(userTo)
+                resp.status(200).send({status:"OK", message:"se elimino el producto correctamente"})
+            }else{
+                resp.status(400).send({status:"error", message:"no se encontro el elemento, o no posee permisos, asegurese de ser administrador o el autor del producto"})
+            }
+
         }else{
-            resp.status(400).send({status:"error", message:"no se encontro el elemento, o no posee permisos, asegurese de ser administrador o premium"})
+            productoDelete=await this.PM.deleteProduct(id,user)
+            if(productoDelete){
+                resp.status(200).send({status:"OK", message:"se elimino el producto correctamente"})
+            }else{
+                resp.status(400).send({status:"error", message:"no se encontro el elemento, o no posee permisos, asegurese de ser administrador o el autor del producto"})
+            }
         }
+        
     
     }
 }

@@ -86,7 +86,6 @@ class cartManager{
         const cartId= await this.getCartById(cid)
         const quantityAdd = quantity ? quantity : 1
 
-        console.log('corroboro igualdad ' + await owner.owner)
         // como me traer un array en vez del objeto directamente, tomo la posicion 0 para tener el objeto
         let objCart = await cartId[0]
         if (objCart){
@@ -178,11 +177,9 @@ class cartManager{
     }
 
     async buyCart (cid){
-        console.log('soy el ID ' + cid)
+
         const carrito = await this.getCartById(cid)
-        console.log(carrito)
         const objectCart= await carrito[0]
-        console.log(await objectCart.products)
         if (carrito == false){
            return false
         }else{
@@ -197,8 +194,6 @@ class cartManager{
                     listaNoCompra.push(data)
                 }
             })
-            console.log(listaCompra)
-            console.log(listaNoCompra)
             await this.updateCart(cid, listaNoCompra)
             return ({purchaseProd:listaCompra, notPurchaseProd:listaNoCompra})
         }

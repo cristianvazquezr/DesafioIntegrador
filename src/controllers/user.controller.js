@@ -5,6 +5,9 @@ import { generateUserErrorInfo, searchedUserErrorInfo } from "../services/messag
 import EErrors from "../services/errors/enums.js";
 import { userModel } from "../dao/models/user.model.js";
 import { tr } from "@faker-js/faker";
+import moment from "moment/moment.js";
+
+
 
 class userController {
     constructor(){
@@ -28,7 +31,6 @@ class userController {
     loginGitHub=async(req, res)=>{
         const lastConnection= await this.UM.lastConnection(req.user._id)
 
-        console.log('soy el lastConnnection ' + lastConnection)
         delete req.user.password
         delete req.user.__v
         req.session.user={
@@ -68,6 +70,99 @@ class userController {
         resp.send({status:'ok', message: 'se creo el usuario con exito', payload:result})
     }
 
+    getUsers= async(req,resp)=>{
+        let searchedUser=[]
+        try{
+            searchedUser= await userModel.find().lean()
+        }catch(err){
+            console.log(err)
+            searchedUser= null
+        }
+        if(searchedUser==null){
+            resp.status(500).send({status:'error', message: 'no se pudieron obtener los usuarios'})
+        }else{
+
+            searchedUser.map((user)=>{
+                delete user.__v
+                delete user.age
+                delete user.password
+                delete user.cart
+                delete user.documents
+                delete user.documentStatus
+                return user
+            }
+            )
+            resp.status(200).send({status:'OK', message: 'usuarios cargados', payload:searchedUser})
+        }
+    }
+
+    deleteUser= async(req,resp)=>{
+        let uid=req.params.uid
+        try{
+            let searchedUser= await userModel.findOne({_id:uid}).lean()
+            if(searchedUser){
+                let deleteUser=await userModel.deleteOne({_id:uid})
+                resp.status(200).send({status:'Ok', message: 'usuario eliminado'})
+            }else{
+                resp.status(400).send({status:'error', message: 'el usuario que desea eliminar no existe'})
+            }
+        }catch(err){
+            console.log(err)
+            resp.status(400).send({status:'error', message: 'no se pudo obtener el usuario o fallo la conexion'})
+        }
+
+    }
+
+    deleteInative= async(req,resp)=>{
+        let searchedUser=[]
+        try{
+            searchedUser= await userModel.find().lean()
+        }catch(err){
+            console.log(err)
+            searchedUser= null
+        }
+        if(searchedUser==null){
+            resp.status(500).send({status:'error', message: 'no se pudieron obtener los usuarios'})
+        }else{
+            searchedUser.map(async (user)=>{
+                let resta=''
+                let uid=user._id
+                let email=user.email
+                if (user.last_connection){
+                    // desestructuro la fecha q esta cargada en mongo, luego con moment la convierto en un formato conocido para realizar la resta 
+                    let date=moment(user.last_connection.split(' - ')[0],'DD-MM-YYYY').format('MM-DD-YYYY')
+                    let time=moment(user.last_connection.split(' - ')[1],'hh:mm:ss').format('hh:mm:ss')
+                    // fecha conexion
+                    let dateConnection = moment(date + ' ' + time,'MM-DD-YYYY hh:mm:ss').format('MM-DD-YYYY hh:mm:ss')
+                    // fecha actual
+                    let nowDate=moment().format('MM-DD-YYYY hh:mm:ss')
+                    resta=moment(nowDate,'MM-DD-YYYY hh:mm:ss').diff(moment(dateConnection,'MM-DD-YYYY hh:mm:ss'), 'minutes')
+
+                    if (resta>=30){
+                        
+                        await userModel.deleteOne({_id:uid})
+                        //enviar mail 
+                        let userTo=email
+                        await this.UM.sendEmail(userTo)
+
+                    }
+                }else{
+                    await userModel.deleteOne({_id:uid})
+                    //enviar mail 
+                    let userTo=email
+                    await this.UM.sendEmail(userTo)
+
+                }
+            })
+
+
+            resp.status(200).send({status:'OK', message: 'usuarios eliminados'})
+
+           
+        }
+    }
+
+
     changeRole = async(req,resp)=>{
         let uid=req.params.uid
         let searchedUser=''
@@ -100,7 +195,6 @@ class userController {
         if(!req.file){
             return resp.status(400).send({status:"error", message:"no se adjunto archivo"})
         }else{
-            console.log(req.file)
             let documentsPath= req.file.path
             let documentType= req.file.fieldname
             let documentName=req.file.filename

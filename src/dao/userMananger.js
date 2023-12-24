@@ -1,6 +1,18 @@
 import { createHash, isValidPassword } from "../utils.js"
 import { cartModel } from "./models/cart.model.js"
 import { userModel } from "./models/user.model.js"
+import nodemailer from "nodemailer";
+import config from "../config/config.js";
+
+const transporter = nodemailer.createTransport({
+    service:'gmail',
+    port:587,
+    auth:{
+        user:config.mailingUser,
+        pass:config.mailingPass
+    }
+})
+
 
 class userMananger{
 
@@ -20,6 +32,32 @@ class userMananger{
         console.log("Not found")
         return (false)
         }
+    }
+
+    async sendEmail(userTo){
+        try{let result= await transporter.sendMail({
+            from:'vazquezcristianr@gmail.com',
+            to:userTo,
+            subject:"Usuario eliminado",
+            html:`
+            <div>
+                <h1>Usuario eliminado </h1>
+                <p> SE ELIMINO EL USUARIO POR INACTIVIDAD </p>
+            </div>
+            `,
+            attachments:[]
+        }, (err, info)=>{
+            if(err){
+                console.error(err)
+            }else{
+                console.log("message sent: %s" + info.messageId)
+            }
+            
+        })
+        } catch(error){
+            console.log(error)
+        }  
+
     }
 
     async uploaderManager(uid,fileName,documentsPath,documentType,documentSubType){
@@ -65,7 +103,6 @@ class userMananger{
 
     async lastConnection(id){
         // llamo la funcion para obtener los usuarios y buscar por id
-        console.log('soy la funcion interna de lastConnnection ' + id)
         const usuarioBuscado=await userModel.find({_id:id})
         if(await usuarioBuscado!=undefined){
 
@@ -243,8 +280,6 @@ class userMananger{
             return "invalidCart"
         }else{
             userUpdate.cart=[{cart:cartId}]
-            console.log(userUpdate.cart)
-            console.log(cartId)
             await userModel.updateOne({email:user},{cart:userUpdate.cart})
             return ('cartAgregado')
         }

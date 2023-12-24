@@ -33,6 +33,8 @@ let botonRegister = document.getElementById("botonRegister")
 botonRegister.onclick = (event)=>{
     event.preventDefault()
     register()
+
+
 }
 
 
@@ -65,10 +67,25 @@ async function register(){
         let registerUser = await consulta.json()
         let alerta=document.getElementById('alerta')
         alerta.innerHTML= 'usuario registrado'
+
+        Swal.fire({
+            title: "Good job!",
+            text: "Usuario agregado exitosamente",
+            icon: "success"
+        });
+
+
         return registerUser
     }catch(err){
         let alerta=document.getElementById('alerta')
         alerta.innerHTML= `fallo el registro, usuario ya registrado \n o no ingreso todos los datos`
+        Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: `fallo el registro, usuario ya registrado \n o no ingreso todos los datos`,
+            footer: '<a href="#">Why do I have this issue?</a>'
+          });
+
     }
     
     
@@ -102,8 +119,24 @@ async function cambiarPass(){
         let email=await fetch(`/api/email`, {
         method:'get',
         })
-        console.log(email.status + ' ' + email.message)
+        mailObj=await email.json
+        console.log(mailObj.status + ' ' + mailObj.message)
         console.log("Correo Enviado")
+        //alerta
+        Toastify({
+            text: "Correo Enviado",
+            className: "info",
+            style: {
+              background: "linear-gradient(to right, #00b09b, #96c93d)",
+            }
+        }).showToast();
+        //cartel
+        Swal.fire({
+            title: "Correo enviado!",
+            text: "revise su bandeja de correo!",
+            icon: "success"
+          });
+
     }catch(err){
         console.log("fallo " + err)
     }

@@ -1,7 +1,17 @@
 import { json } from 'express';
 import { productModel  } from './models/product.model.js'
 import { userModel } from './models/user.model.js';
+import nodemailer from "nodemailer";
+import config from "../config/config.js";
 
+const transporter = nodemailer.createTransport({
+    service:'gmail',
+    port:587,
+    auth:{
+        user:config.mailingUser,
+        pass:config.mailingPass
+    }
+})
 
 class ProductManager{
 
@@ -60,8 +70,31 @@ class ProductManager{
         } 
         return listaProducto 
     }
+    async sendEmail(userTo){
+        try{let result= await transporter.sendMail({
+            from:'vazquezcristianr@gmail.com',
+            to:userTo,
+            subject:"Producto eliminado",
+            html:`
+            <div>
+                <h1>Producto eliminado </h1>
+                <p> SE ELIMINO EL PRODUCTO QUE USTED CREO </p>
+            </div>
+            `,
+            attachments:[]
+        }, (err, info)=>{
+            if(err){
+                console.error(err)
+            }else{
+                console.log("message sent: %s" + info.messageId)
+            }
+            
+        })
+        } catch(error){
+            console.log(error)
+        }  
 
-
+    }
     async addProduct(title, description, category, price, thumbnail, code, stock, owner){
         //creo un objeto nuevo con atributos nuevos
         let producto1= {title:title,description:description,price:price,thumbnail:thumbnail,code:code,stock:stock, category:category, status:true,owner:owner}
@@ -184,7 +217,7 @@ class ProductManager{
         
         //valido que exista el id
         if (await Product!=false){
-            if(Product.owner==email || user.role=='admin'){
+            if(Product[0].owner==email || user.role=='admin'){
                 await productModel.deleteOne({_id:id})
                 return true
             } else{

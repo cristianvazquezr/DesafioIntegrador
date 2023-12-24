@@ -3,7 +3,6 @@
 window.onload=function () {
     countItemCart()
     let totalPrice=document.getElementsByClassName('totalPrice')
-    console.log(document.getElementsByClassName('price'))
     for (i in totalPrice){
         let idProducto=totalPrice[i].id
         let precio=document.getElementById(`p${idProducto}`)
@@ -79,16 +78,26 @@ async function cambiarPass(){
         let email=await fetch(`/api/email`, {
         method:'get',
         })
-        console.log(email.status + ' ' + email.message)
+        mailObj=await email.json
+        console.log(mailObj.status + ' ' + mailObj.message)
         console.log("Correo Enviado")
+        //alerta
+        Toastify({
+            text: "Correo Enviado",
+            className: "info",
+            style: {
+              background: "linear-gradient(to right, #00b09b, #96c93d)",
+            }
+        }).showToast();
+        //cartel
+        Swal.fire({
+            title: "Correo enviado!",
+            text: "revise su bandeja de correo!",
+            icon: "success"
+          });
+
     }catch(err){
         console.log("fallo " + err)
     }
-}
-
-let restoreElement = document.getElementById("RecuperarPass")
-restoreElement.onclick=(event)=>{
-    event.preventDefault()
-    cambiarPass()
 }
 

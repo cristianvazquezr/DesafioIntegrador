@@ -45,12 +45,10 @@ class mailController{
             }
             
         })
-    }catch(error){
-        console.log(error)
-        resp.status(500).send({message:'no se pudo enviar el correo desde: ' + config.mailingUser, error:error})
-    }
-        
-        
+        } catch(error){
+            console.log(error)
+            resp.status(500).send({message:'no se pudo enviar el correo desde: ' + config.mailingUser, error:error})
+        }  
     }
     sendMailWithAttachments=async (req, resp)=>{
 

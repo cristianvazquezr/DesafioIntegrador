@@ -18,10 +18,16 @@ userRouter.get('/user/:uid',UC.getUserById)
 
 userRouter.post('/user/premium/:uid',UC.changeRole)
 
+userRouter.delete('/user/:uid',UC.deleteUser)
+
 userRouter.post('/user/:uid/documents/document',uploader.single('document'),UC.uploader)
 
 userRouter.post('/user/:uid/documents/profile',uploader.single('profile'),UC.uploader)
 
 userRouter.post('/user/:uid/documents/product',uploader.single('product'),UC.uploader)
+
+userRouter.get('/user/',UC.getUsers)
+
+userRouter.delete('/user/',UC.deleteInative)
 
 export default userRouter

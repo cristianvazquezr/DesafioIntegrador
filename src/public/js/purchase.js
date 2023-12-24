@@ -3,7 +3,6 @@
 window.onload=function () {
     countItemCart()
     let totalPrice=document.getElementsByClassName('totalPrice')
-    console.log(document.getElementsByClassName('price'))
     for (i in totalPrice){
         let idProducto=totalPrice[i].id
         let precio=document.getElementById(`p${idProducto}`)
@@ -69,24 +68,6 @@ async function logout(){
 
 }
 
-// async function purchase(){
-//     let cartUser= await JSON.parse(sessionStorage.getItem('carrito'))
-//     try{
-//         await fetch(`/api/carts/${cartUser}/purchase`, {
-//         method:'post',
-//         })
-//         console.log("compra finalizada")
-//         let purchase=await fetch(`/api/carts/${cartUser}/purchase`, {
-//             method:'post',
-//         })
-        
-        
-//     }catch(err){
-//         console.log("fallo " + err)
-//     }
-
-
-// }
 
 
 async function purchase(){
@@ -110,7 +91,6 @@ async function purchase(){
 window.onload=function () {
     countItemCart()
     let totalPrice=document.getElementsByClassName('totalPrice')
-    console.log(document.getElementsByClassName('price'))
     for (i in totalPrice){
         let idProducto=totalPrice[i].id
         let precio=document.getElementById(`p${idProducto}`)

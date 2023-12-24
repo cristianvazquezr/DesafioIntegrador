@@ -7,7 +7,6 @@ let cantidadCarrito=document.getElementById("numerito")
 async function countItemCart(){
 
     let cartUser= await JSON.parse(sessionStorage.getItem('carrito'))
-    console.log(await cartUser)
     let idCart=''
     if(cartUser){
         idCart=await cartUser
@@ -26,7 +25,6 @@ async function countItemCart(){
     }
     cantidadCarrito.innerHTML=countItem
 
-    console.log(countItem)
 }
 
 countItemCart()
@@ -59,8 +57,24 @@ async function cambiarPass(){
         let email=await fetch(`/api/email`, {
         method:'get',
         })
-        console.log(email.status + ' ' + email.message)
+        mailObj=await email.json
+        console.log(mailObj.status + ' ' + mailObj.message)
         console.log("Correo Enviado")
+        //alerta
+        Toastify({
+            text: "Correo Enviado",
+            className: "info",
+            style: {
+              background: "linear-gradient(to right, #00b09b, #96c93d)",
+            }
+        }).showToast();
+        //cartel
+        Swal.fire({
+            title: "Correo enviado!",
+            text: "revise su bandeja de correo!",
+            icon: "success"
+          });
+
     }catch(err){
         console.log("fallo " + err)
     }
@@ -75,7 +89,6 @@ restoreElement.onclick=(event)=>{
 // guardo en el sessionStorage el ID del carrito en el que va trabajar el cliente. sino existe lo crea.
 async function validarCarrito(){
     let cartUser= await JSON.parse(sessionStorage.getItem('carrito'))
-    console.log(await cartUser)
     let idCart=''
     if(cartUser){
         idCart=await cartUser
@@ -99,8 +112,6 @@ async function validarCarrito(){
         let datos = await getUser.json()
         user=await datos.datos[0].email
 
-        console.log("hola soy el user " + user)
-
        //agrego el carrito al usuario
        let addCart = await fetch(`api/user/${user}/cart/${idCart}`, {
             method:'post',
@@ -109,7 +120,6 @@ async function validarCarrito(){
             }
         })
 
-        console.log(await addCart)
     }
     sessionStorage.setItem('carrito',JSON.stringify(idCart));
     return idCart
@@ -142,9 +152,15 @@ async function addToCart(idProducto){
             "Content-Type": "application/json",
         }
         })
-        console.log(await addProd)
         await countItemCart()
         await hrefCarrito()
+        Toastify({
+            text: "Producto agregado",
+            className: "info",
+            style: {
+              background: "linear-gradient(to right, #00b09b, #96c93d)",
+            }
+        }).showToast();
     }catch(err){
         console.log("fallo " + err)
     }
